@@ -3,7 +3,7 @@
 # @Author: tan
 # @Date:   2015-08-13 14:18:37
 # @Last Modified by:   tan
-# @Last Modified time: 2015-08-17 16:37:36
+# @Last Modified time: 2015-08-18 11:33:38
 
 import requests
 from requests.sessions import Session
@@ -108,13 +108,13 @@ class Router_info_grab(object):
         dns = ''
 
         if (fm_re[0] != ''):
-            fm_pattern = re.compile(fm_re[0], re.I)
+            fm_pattern = re.compile(fm_re[0], re.I | re.S)
             fm_match = fm_pattern.search(raw)
             if fm_match:
                 fm_version = fm_match.group(fm_re[1])
 
         if (hm_re[0] != ''):
-            hm_pattern = re.compile(hm_re[0], re.I)
+            hm_pattern = re.compile(hm_re[0], re.I | re.S)
             hm_match = hm_pattern.search(raw)
             if hm_match:
                 hm_version = hm_match.group(hm_re[1])
@@ -129,9 +129,10 @@ class Router_info_grab(object):
 
     def typeRec(self, fingerprint, raw):
         """区分路由器品牌，决定抓取方式，目前支持TP-Link, D-Link, DD-WRT"""
-        tp_re = 'TP[\W]LINK'
-        ddwrt_re = 'DD[\W]WRT'
-        dlink_re = 'D[\W]LINK'
+        tp_re = 'TP[\W]?LINK'
+        ddwrt_re = 'DD[\W]?WRT'
+        dlink_re = 'D[\W]?LINK'
+        #print raw
 
         #注意，DD-WRT必须出现在TP-Link或其他品牌之前，因为DD-WRT中包含其他品牌型号，导致识别错误
         ddwrt_pattern = re.compile(ddwrt_re, re.I)
@@ -164,9 +165,9 @@ class Router_info_grab(object):
         return self.ROUTER_BRAND['UNKNOW']
 
     def tplinkGrab(self, s, router_info, url):
-        #r = s.get(url, auth = (self.router_name, self.router_passwd) , timeout = 5, allow_redirects = True, headers = self.header)
         my_headers = self.header
         my_headers['Referer'] = url
+        #r = s.get(url, auth = (self.router_name, self.router_passwd) , timeout = 5, allow_redirects = True, headers = self.header)
         r = s.get(url + '/userRpm/StatusRpm.htm', auth = (self.router_name, self.router_passwd) , timeout = 5, allow_redirects = True, headers = my_headers)
         if (r.status_code == 401):
             print 'Wrong username/passwd!'
@@ -175,8 +176,9 @@ class Router_info_grab(object):
             router_info['passwd'] = self.router_passwd
             
             """WR840N"""
-            fm_re = [r'var statusPara = new Array\(\n(.+?\n){5}"(.+?)"', 2]
-            hm_re = [r'var statusPara = new Array\(\n(.+?\n){6}"(.+?)"', 2]
+            #fm_re = [r'var statusPara = new Array\(\n(.+?\n){5}"(.+?)"', 2]
+            fm_re = [r'var statusPara = new Array.+?"(.+?)"', 1]
+            hm_re = [r'var statusPara = new Array.+?".+?".+?"(.+?)"', 1]
             dns_re = [r'var wanPara = new Array(.+?)"([\d\.]+? , [\d\.]+?)"', 2]
             
             fm, hm, dns = self.detail_grab(fm_re, hm_re, dns_re, r.content)
@@ -234,7 +236,7 @@ class Router_info_grab(object):
             fingerprint = router_info['router_server'] + ' ' + router_info['router_realm']
             if (fingerprint != ''):
                 router_type = self.typeRec(fingerprint, r.content)
-                #print router_type
+                print router_type
                 if router_type == self.ROUTER_BRAND['TP-LINK']:
                     self.tplinkGrab(s, router_info, url)
                 elif router_type == self.ROUTER_BRAND['DD-WRT']:
