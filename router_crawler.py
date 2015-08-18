@@ -3,14 +3,14 @@
 # @Author: tan
 # @Date:   2015-08-13 14:18:37
 # @Last Modified by:   tan
-# @Last Modified time: 2015-08-18 11:33:38
+# @Last Modified time: 2015-08-18 16:51:59
 
 import requests
 from requests.sessions import Session
 from requests.auth import AuthBase
-#from requests.exceptions import ConnectTimeout
 import socket
 import re
+import base64
 
 class Error_port(Exception):
     """自定义的端口错误类"""
@@ -33,8 +33,8 @@ class Error_router_offline(Exception):
     def __str__(self):
         return repr(self.value)
 
-class Router_info_grab(object):
-    """Automatic grab routers' info including version and configure settings"""
+class RouterCrawler(object):
+    """Automatic crawl routers' info including version and configure settings"""
     """自动抓取路由器版本以及配置信息"""
 
     router_name = ''
@@ -56,7 +56,8 @@ class Router_info_grab(object):
     header = {
                 b'User-Agent': b'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0', 
                 b'Accept-Language': b'en-US',
-                b'Referer': ''
+                b'Referer': '',
+                b'Cookie': ''
             }
 
 
@@ -96,12 +97,13 @@ class Router_info_grab(object):
             self.router_port = port
         else:
             raise Error_port
-        if (Router_info_grab.valid_ip(addr)):
+        if (RouterCrawler.valid_ip(addr)):
             self.addr = addr
         else:
             raise Error_addr
+            #self.addr = addr
 
-    def detail_grab(self, fm_re, hm_re, dns_re, raw):
+    def detialCrawl(self, fm_re, hm_re, dns_re, raw):
         """进一步在抓取固件版本，硬件版本，DNS等信息，基于正则表达式匹配"""
         fm_version = ''
         hm_version = ''
@@ -163,97 +165,105 @@ class Router_info_grab(object):
                 return self.ROUTER_BRAND['D-LINK']
 
         return self.ROUTER_BRAND['UNKNOW']
+        #return self.ROUTER_BRAND['TP-LINK']
 
-    def tplinkGrab(self, s, router_info, url):
-        my_headers = self.header
-        my_headers['Referer'] = url
-        #r = s.get(url, auth = (self.router_name, self.router_passwd) , timeout = 5, allow_redirects = True, headers = self.header)
-        r = s.get(url + '/userRpm/StatusRpm.htm', auth = (self.router_name, self.router_passwd) , timeout = 5, allow_redirects = True, headers = my_headers)
+    def tplinkCrawl(self, s, router_info, url):
+        cookie = base64.b64encode(self.router_name + ':' + self.router_passwd)
+        self.header['Cookie'] = 'Authorization=Basic ' + cookie
+        #self.header['Cookie'] = 'tLargeScreenP=1; subType=pcSub; Authorization=Basic YWRtaW46MTIzNDU2'
+        for x in xrange(3):
+            try:
+                r = s.get(url + '/userRpm/StatusRpm.htm', auth = (self.router_name, self.router_passwd) , timeout = 5, allow_redirects = True, headers = self.header)
+                break
+            except Exception, e:
+                router_info['status'] = 'crwaling timeout'
+                return
         if (r.status_code == 401):
             print 'Wrong username/passwd!'
         else:
             router_info['username'] = self.router_name
             router_info['passwd'] = self.router_passwd
-            
-            """WR840N"""
+            router_info['status'] = 'success'
+
             #fm_re = [r'var statusPara = new Array\(\n(.+?\n){5}"(.+?)"', 2]
-            fm_re = [r'var statusPara = new Array.+?"(.+?)"', 1]
-            hm_re = [r'var statusPara = new Array.+?".+?".+?"(.+?)"', 1]
-            dns_re = [r'var wanPara = new Array(.+?)"([\d\.]+? , [\d\.]+?)"', 2]
-            
-            fm, hm, dns = self.detail_grab(fm_re, hm_re, dns_re, r.content)
+            fm_re = [r'var statusPara.+?"(.+?)"', 1]
+            hm_re = [r'var statusPara.+?".+?".+?"(.+?)"', 1]
+            dns_re = [r'var wanPara(.+?)"([\d\.]+? , [\d\.]+?)"', 2]
+            print r.content
+            fm, hm, dns = self.detialCrawl(fm_re, hm_re, dns_re, r.content)
             router_info['fm_version'] = fm
             router_info['hm_version'] = hm
             router_info['dns'] = dns
 
-    def ddwrtGrab(self, s, router_info, url):
-        my_headers = self.header
-        my_headers['Referer'] = url
+    def ddwrtCrawl(self, s, router_info, url):
         r = s.get(url, timeout = 3, allow_redirects = True, headers = self.header)
         """DD-WRT"""
         fm_re = [r'openAboutWindow.+?>(.+?)</a>', 1]
         hm_re = [r'>Capture\(status_router.sys_model.+?\n(.+?)&nbsp;', 1]
         dns_re = [r'', 0]
 
-        fm, hm, dns = self.detail_grab(fm_re, hm_re, dns_re, r.content)
+        fm, hm, dns = self.detialCrawl(fm_re, hm_re, dns_re, r.content)
         router_info['fm_version'] = fm
         router_info['hm_version'] = hm
         router_info['dns'] = dns        
 
 
-    def grab(self, type = ROUTER_TYPE['BASE_AUTH']):
+    def crawl(self, type = ROUTER_TYPE['BASE_AUTH']):
         #构造路由器地址
         url = 'http://' + self.router_addr + ':' + str(self.router_port)
+        print url
+        self.header['Referer'] = url
+        router_info = {
+                'url': url,
+                'status': '',
+                'router_server': '',
+                'router_realm': '',
+                'username': '',
+                'passwd': '',
+                'fm_version': '',
+                'hm_version': '',
+                'dns': ''
+                }
         s = Session()
         try:
             r = s.get(url, timeout = 3, allow_redirects = True, headers = self.header)
-            #r2 = s.get(url, auth = (self.router_name, self.router_passwd) , timeout = 5, allow_redirects = True, headers = header)
         except Exception, e:
             #print self.router_addr + ': Timeout!'
             print e
+            router_info['status'] = 'connec timeout'
         else:
-            router_info = {
-                            'url': url,
-                            'router_server': '',
-                            'router_realm': '',
-                            'username': '',
-                            'passwd': '',
-                            'fm_version': '',
-                            'hm_version': '',
-                            'dns': ''
-                            }
-            print r.headers
+            #print r.headers
             if 'server' in r.headers:
                 router_server = r.headers['server']
-                print router_server
+                #print router_server
                 router_info['router_server'] = router_server
             if 'www-authenticate' in r.headers:
                 router_realm = r.headers['www-authenticate']
-                print router_realm
+                #print router_realm
                 router_info['router_realm'] = router_realm
 
             #利用返回头部中的server和www-authenticate字段对路由器类型进行基本识别，再采取相应的抓取方法进行抓取
             fingerprint = router_info['router_server'] + ' ' + router_info['router_realm']
             if (fingerprint != ''):
                 router_type = self.typeRec(fingerprint, r.content)
-                print router_type
+                #print router_type
                 if router_type == self.ROUTER_BRAND['TP-LINK']:
-                    self.tplinkGrab(s, router_info, url)
+                    self.tplinkCrawl(s, router_info, url)
                 elif router_type == self.ROUTER_BRAND['DD-WRT']:
-                    self.ddwrtGrab(s, router_info, url) 
-
-                for (k, v) in router_info.items():
-                    print '%s = ' % k, v
+                    self.ddwrtCrawl(s, router_info, url) 
         finally:
+            return router_info
             pass
             #print r.content
 
 if __name__ == '__main__':
     """测试用例"""
-    test_addr = '90.154.225.49'
+    test_addr = '192.168.1.253'
     test_port = 80
     test_name = 'admin'
-    test_passwd = 'admin'
+    test_passwd = '123456'
 
-    test_router_info_grab = Router_info_grab(addr = test_addr, port = test_port)
-    test_router_info_grab.grab()
+    test_router_info_grab = RouterCrawler(addr = test_addr, port = test_port, name = test_name, passwd = test_passwd)
+    ret = test_router_info_grab.crawl()
+    for (k, v) in ret.items():
+        print '%s = ' % k, v
