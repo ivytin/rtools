@@ -3,13 +3,13 @@
 # @Author: tan
 # @Date:   2015-08-17 19:00:47
 # @Last Modified by:   tan
-# @Last Modified time: 2015-08-18 14:33:15
+# @Last Modified time: 2015-08-18 15:02:26
 
 import csv
 import requests
 import Queue
 import threading
-from info_test import Router_info_grab
+from router_crawler import RouterCrawler
 
 class WorkManager(object):
     """线程池管理类，用于管理路由器抓取线程"""
@@ -37,8 +37,8 @@ class WorkManager(object):
 
     def crawler(self, target):
     #target sample: ['ip', port, 'username', 'passwd']
-        crawler_thread = Router_info_grab(addr = target[0], port = target[1], name = target[2], passwd = target[3])
-        router_info = crawler_thread.grab()
+        crawler_thread = RouterCrawler(addr = target[0], port = target[1], name = target[2], passwd = target[3])
+        router_info = crawler_thread.crawl()
         # for (k,v) in  router_info.items():
         #     print k, ' ', v
         self.data_out(self.data_out_path, self.file_lock, router_info)
@@ -48,11 +48,28 @@ class WorkManager(object):
         csvfile = file(file_path, 'ab')
         writer = csv.writer(csvfile)
         router_row = []
-        for (k, v) in router_info.items():
-            if v == '':
-                router_row.append('null')
-            else:    
-                router_row.append(v)
+        #由于Python字典是无序的，这里手动遍历，获得全部内容，格式如下
+        # router_info = {
+        #         'url': url,
+        #         'status': '',
+        #         'router_server': '',
+        #         'router_realm': '',
+        #         'username': '',
+        #         'passwd': '',
+        #         'fm_version': '',
+        #         'hm_version': '',
+        #         'dns': ''
+        #         }
+        router_row.append(router_info['url'])
+        router_row.append(router_info['status'])
+        router_row.append(router_info['router_server'])
+        router_row.append(router_info['router_realm'])
+        router_row.append(router_info['username'])
+        router_row.append(router_info['passwd'])
+        router_row.append(router_info['fm_version'])
+        router_row.append(router_info['hm_version'])
+        router_row.append(router_info['hm_version'])
+        router_row.append(router_info['dns'])
         writer.writerow(router_row)
         csvfile.close()
         file_lock.release()
