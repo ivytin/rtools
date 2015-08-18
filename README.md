@@ -1,3 +1,7 @@
 # router_info_scan
-##### A router infomation crawler with multithreading(thread pool) support.
-##### now support: TP-Link WR serial router
+August 18, 2015 2:53 PM
+
+- - -
+A router infomation crawler with multithreading(thread pool) support.
+Now support: 
+- TP-Link WR serial router
