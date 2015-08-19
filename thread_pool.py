@@ -3,19 +3,22 @@
 # @Author: tan
 # @Date:   2015-08-17 19:00:47
 # @Last Modified by:   tan
-# @Last Modified time: 2015-08-18 15:02:26
+# @Last Modified time: 2015-08-19 17:59:54
 
 import csv
 import requests
 import Queue
 import threading
+import time
 from router_crawler import RouterCrawler
+from router_crawler import Error_addr
 
 class WorkManager(object):
     """线程池管理类，用于管理路由器抓取线程"""
 
     def __init__(self, data_in_path, data_out_path, thread_num = 20):
         """初始化任务队列和线程队列"""
+        self.file_lock = threading.Lock()
         self.work_queue = Queue.Queue()
         self.threads = []
         self.target_list = []
@@ -24,7 +27,6 @@ class WorkManager(object):
         self.data_out_path = data_out_path
         self.__init_work_queue(target_num, self.target_list)
         self.__init_thread_pool(thread_num)
-        self.file_lock = threading.Lock()
 
     def __init_work_queue(self, target_num, target_list):
         for x in xrange(target_num):
@@ -37,14 +39,19 @@ class WorkManager(object):
 
     def crawler(self, target):
     #target sample: ['ip', port, 'username', 'passwd']
-        crawler_thread = RouterCrawler(addr = target[0], port = target[1], name = target[2], passwd = target[3])
-        router_info = crawler_thread.crawl()
+        #try:
+        #print target
+        try:
+            crawler_thread = RouterCrawler(addr = target[0], port = target[1], name = target[2], passwd = target[3])
+            router_info = crawler_thread.crawl()
+            self.data_out(self.data_out_path, router_info)
+        except Error_addr, e:
+            print es
         # for (k,v) in  router_info.items():
         #     print k, ' ', v
-        self.data_out(self.data_out_path, self.file_lock, router_info)
 
-    def data_out(self, file_path, file_lock, router_info):
-        file_lock.acquire()
+    def data_out(self, file_path, router_info):
+        self.file_lock.acquire()
         csvfile = file(file_path, 'ab')
         writer = csv.writer(csvfile)
         router_row = []
@@ -60,19 +67,27 @@ class WorkManager(object):
         #         'hm_version': '',
         #         'dns': ''
         #         }
-        router_row.append(router_info['url'])
-        router_row.append(router_info['status'])
-        router_row.append(router_info['router_server'])
-        router_row.append(router_info['router_realm'])
-        router_row.append(router_info['username'])
-        router_row.append(router_info['passwd'])
-        router_row.append(router_info['fm_version'])
-        router_row.append(router_info['hm_version'])
-        router_row.append(router_info['hm_version'])
-        router_row.append(router_info['dns'])
-        writer.writerow(router_row)
+        columns = ['url', 'status', 'router_server', 'router_realm', 'username', 'passwd', 'fm_version', 'hm_version', 'dns']
+        try:
+            for column in columns:
+                if column in router_info:
+                    router_row.append(router_info[column])
+                else:
+                    router_info.append('')
+            # router_row.append(router_info['url'])
+            # router_row.append(router_info['status'])
+            # router_row.append(router_info['router_server'])
+            # router_row.append(router_info['router_realm'])
+            # router_row.append(router_info['username'])
+            # router_row.append(router_info['passwd'])
+            # router_row.append(router_info['fm_version'])
+            # router_row.append(router_info['hm_version'])
+            # router_row.append(router_info['dns'])
+            writer.writerow(router_row)
+        except Exception, e:
+            pass
         csvfile.close()
-        file_lock.release()
+        self.file_lock.release()
 
     def data_in(self, file_path):
         self.tartget_list = []
@@ -97,8 +112,10 @@ class WorkManager(object):
 
     def wait_all(self):
         for x in self.threads:
-            if x.isAlive():
-                x.join()
+            while x.isAlive():
+                #x.join()
+                print self.check_queue(), 'threads reaming'
+                time.sleep(5)
 
 class Work(threading.Thread):
     """路由器信息抓取线程"""
@@ -115,7 +132,7 @@ class Work(threading.Thread):
                 crawl_func(target)
                 self.work_queue.task_done()
             except Exception, e:
-                print e
+                #raise e
                 #抛出异常，说明任务队列已经被清空
                 break
 
