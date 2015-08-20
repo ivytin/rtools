@@ -3,7 +3,7 @@
 # @Author: tan
 # @Date:   2015-08-19 10:52:55
 # @Last Modified by:   tan
-# @Last Modified time: 2015-08-19 11:30:52
+# @Last Modified time: 2015-08-19 14:24:03
 
 """ MODULE_MATCH
     |ID|type_index|type|model|fingerprint|weight|
@@ -257,5 +257,5 @@ if __name__ == '__main__':
     db.open()
     rs = db.table("MODULE_MATCH").select('ID', 'FINGERPRINT').fetchall()
     print rs
-    rs = db.table("MODULE_MATCH").select('ID', 'FINGERPRINT').where(DataCondition((">", "AND"), WEIGHT = 0)).fetchall()
+    rs = db.table("MODULE_MATCH").select('ID', 'FINGERPRINT').where(DataCondition((">", "AND"), WEIGHT = 9)).fetchall()
     print rs

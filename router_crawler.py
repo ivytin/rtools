@@ -3,7 +3,7 @@
 # @Author: tan
 # @Date:   2015-08-13 14:18:37
 # @Last Modified by:   tan
-# @Last Modified time: 2015-08-19 15:07:21
+# @Last Modified time: 2015-08-19 18:41:54
 
 import requests
 from requests.sessions import Session
@@ -29,7 +29,7 @@ class Error_addr(Exception):
         return repr(self.value)
 
 class Error_router_offline(Exception):
-    """自定义的I路由器离线错误，目标地址不可达"""
+    """自定义的路由器离线错误，目标地址不可达"""
     def __init__(self):
         self.value = 'routers offline (can not reach dest)'
     def __str__(self):
@@ -90,12 +90,13 @@ class RouterCrawler(object):
 
 
 
-    def __init__(self, addr, port = 80, name='admin', passwd = 'admin'):
+    def __init__(self, addr, port = 80, name='admin', passwd = 'admin', debug = False):
         """初始化路由器信息，包括router_name， router_passwd， router_addr， router_port"""
         self.router_name = name
         self.router_passwd = passwd
         self.router_addr = addr
         self.db = DataHelper("testDB.db")
+        self.debug_flag = debug
         if (0 < port and port < 65432):
             self.router_port = port
         else:
@@ -175,6 +176,9 @@ class RouterCrawler(object):
         else:
             self.header['Referer'] = ''
 
+        if self.debug_flag:
+            print self.header
+
         for x in xrange(3):
             try:
                 url += info_url
@@ -187,6 +191,8 @@ class RouterCrawler(object):
         if (r.status_code == 401):
             router_info['status'] = 'Wrong username/passwd!'
         else:
+            if self.debug_flag:
+                print r.content[:100]
             router_id = router_info
             router_info['username'] = self.router_name
             router_info['passwd'] = self.router_passwd
@@ -229,9 +235,10 @@ class RouterCrawler(object):
         try:
             r = s.get(url, timeout = 3, allow_redirects = True)
         except Exception, e:
-            #print self.router_addr + ': Timeout!'
-            print e
-            router_info['status'] = 'connec timeout'
+            if self.debug_flag:
+                print e
+            router_info['status'] = 'connect timeout'
+            return router_info
         else:
             #print r.headers
             if 'server' in r.headers:
@@ -265,12 +272,14 @@ class RouterCrawler(object):
             else:
                 router_info['status'] = "no fingerprint"
         finally:
+            if self.debug_flag:
+                print router_info
             return router_info
             #print r.content
 
 if __name__ == '__main__':
     """测试用例"""
-    test_addr = '192.168.1.253'
+    test_addr = '183.178.166.42'
     test_port = 80
     test_name = 'admin'
     test_passwd = '123456'
