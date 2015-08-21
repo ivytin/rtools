@@ -34,3 +34,22 @@ WEIGHT INT NOT NULL,
 FINGERPRINT CHAR (128)
 );
 ```
+
+- - -
+
+#####TP-Link DNS payload
+|ID|HRE_URL|DYNA_PARA|PPP_PARA|DYNA_REF|PPP_REF|
+|---|---|---|---|---|----|
+|0|/userRpm/WanCfgRpm.htm|?Save=save&dnsserver=[dns1]&dnsserver2=[dns2]&manual=2&mtu=1500&wantype=0|lcpMru=1480&manual=2&dnsserver=[dns1]&dnsserver2=[dns2]&Save=save&Advanced=Advanced|/userRpm/WanDynamicIpCfgRpm.htm?wan=0|/userRpm/PPPoECfgAdvRpm.htm?Advanced=%B8%DF%BC%B6%C9%E8%D6%C3&wan=0|
+
+
+```sql
+CREATE TABLE DNS_PAYLOAD (
+ID INT PRIMARY KEY REFERENCES MODULE_MATCH (ID) ON DELETE CASCADE ON UPDATE CASCADE, 
+HRE_URL CHAR (128), 
+DYNA_PARA CHAR (512) NOT NULL, 
+PPP_PARA CHAR (512) NOT NULL, 
+DYNA_REF, 
+PPP_REF
+);
+```
