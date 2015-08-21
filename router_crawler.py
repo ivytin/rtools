@@ -3,7 +3,7 @@
 # @Author: tan
 # @Date:   2015-08-13 14:18:37
 # @Last Modified by:   tan
-# @Last Modified time: 2015-08-19 18:41:54
+# @Last Modified time: 2015-08-21 17:38:44
 
 import requests
 from requests.sessions import Session
@@ -13,20 +13,6 @@ import re
 import base64
 from sqlite_helper import DataHelper
 from sqlite_helper import DataCondition
-
-class Error_port(Exception):
-    """自定义的端口错误类"""
-    def __init__(self):
-        self.value = 'illegal port number'
-    def __str__(self):
-        return repr(self.value)
-
-class Error_addr(Exception):
-    """自定义的IP错误类"""
-    def __init__(self):
-        self.value = 'illegal ip address'
-    def __str__(self):
-        return repr(self.value)
 
 class Error_router_offline(Exception):
     """自定义的路由器离线错误，目标地址不可达"""
@@ -62,16 +48,6 @@ class RouterCrawler(object):
                 b'Cookie': ''
             }
 
-
-    @staticmethod 
-    def valid_ip(address):
-        """验证IP是否合法"""
-        try: 
-            socket.inet_aton(address)
-            return True
-        except:
-            return False
-
     @staticmethod 
     def htm_decode(r):
         """由于requests对中文网页解码不佳，所以用该函数检测响应编码并解码"""
@@ -97,15 +73,8 @@ class RouterCrawler(object):
         self.router_addr = addr
         self.db = DataHelper("testDB.db")
         self.debug_flag = debug
-        if (0 < port and port < 65432):
-            self.router_port = port
-        else:
-            raise Error_port
-        if (RouterCrawler.valid_ip(addr)):
-            self.addr = addr
-        else:
-            raise Error_addr
-            #self.addr = addr
+        self.router_port = port
+        self.addr = addr
         self.db.open()
 
     def reCrawl(self, fm_re, fm_index, hm_re, hm_index, dns_re, dns_index, raw):

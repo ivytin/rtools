@@ -3,7 +3,7 @@
 # @Author: tan
 # @Date:   2015-08-19 15:22:06
 # @Last Modified by:   tan
-# @Last Modified time: 2015-08-19 18:40:08
+# @Last Modified time: 2015-08-21 18:11:13
 
 from optparse import OptionParser
 from router_crawler import RouterCrawler
@@ -24,6 +24,16 @@ parser.add_option("-o", "--output-file", dest="out_file_path", default=default_o
 parser.add_option("-t", "--threads", dest="threads_num", type="int", default=3,
                   help="scan theads num", metavar="NUM")
 
+#启动信息抓取模式
+parser.add_option("-c", "--crawl",
+                  action="store_true", dest="crawl", default=False,  
+                  help="enable the crawling mode")
+
+#启动DNS设置模式
+parser.add_option("-d", "--dns",
+                  action="store_true", dest="crawl", default=False,  
+                  help="enable the dns set mode")
+
 #启动调试模式
 parser.add_option("-d", "--debug",
                   action="store_true", dest="debug", default=False,  
@@ -36,7 +46,14 @@ parser.add_option("-d", "--debug",
 #print options
 #print args
 
+crawl_flag = options.crawl
+dns_flag = options.dns
 debug_flag = options.debug
+
+if ((crawl_flag or dns_flag or debug_flag) == False):
+  print 'no mode choosen, program will exit'
+  sys.exit(-1)
+
 if debug_flag:
     # target_ip = args[0]
     # try:
@@ -60,7 +77,15 @@ except Exception, e:
 
 data_out_path = options.out_file_path
 threads_num = options.threads_num
-debug_target = options.debug_target
 
-work_manager =  WorkManager(data_in_path, data_out_path, thread_num = threads_num)
-work_manager.wait_all()
+if crawl_flag:
+  work_manager =  WorkManager(data_in_path, data_out_path, thread_num = threads_num, 'crawl')
+  work_manager.wait_all()
+  sys.exit(0)
+
+if dns_flag:
+  dns1 = args[0]
+  dns2 = args[1]
+  work_manager =  WorkManager(data_in_path, data_out_path, thread_num = threads_num, 'dns', dns1, dns2)
+  work_manager.wait_all()
+  sys.exit(0)
