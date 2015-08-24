@@ -3,7 +3,7 @@
 # @Author: tan
 # @Date:   2015-08-19 15:22:06
 # @Last Modified by:   tan
-# @Last Modified time: 2015-08-21 18:11:13
+# @Last Modified time: 2015-08-24 13:04:16
 
 from optparse import OptionParser
 from router_crawler import RouterCrawler
@@ -31,11 +31,11 @@ parser.add_option("-c", "--crawl",
 
 #启动DNS设置模式
 parser.add_option("-d", "--dns",
-                  action="store_true", dest="crawl", default=False,  
+                  action="store_true", dest="dns", default=False,  
                   help="enable the dns set mode")
 
 #启动调试模式
-parser.add_option("-d", "--debug",
+parser.add_option("--debug",
                   action="store_true", dest="debug", default=False,  
                   help="enable the debug mode")
 # #调试模式下目标
@@ -79,13 +79,17 @@ data_out_path = options.out_file_path
 threads_num = options.threads_num
 
 if crawl_flag:
-  work_manager =  WorkManager(data_in_path, data_out_path, thread_num = threads_num, 'crawl')
+  work_manager =  WorkManager(data_in_path, data_out_path, threads_num, 'crawl')
   work_manager.wait_all()
   sys.exit(0)
 
 if dns_flag:
-  dns1 = args[0]
-  dns2 = args[1]
-  work_manager =  WorkManager(data_in_path, data_out_path, thread_num = threads_num, 'dns', dns1, dns2)
+  try:
+    dns1 = args[0]
+    dns2 = args[1]
+  except Exception, e:
+    print 'need two dns address to continue'
+    sys.exit(-1)
+  work_manager =  WorkManager(data_in_path, data_out_path, threads_num, 'dns', dns1, dns2)
   work_manager.wait_all()
   sys.exit(0)

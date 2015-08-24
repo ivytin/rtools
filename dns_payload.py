@@ -3,7 +3,7 @@
 # @Author: tan
 # @Date:   2015-08-21 16:47:23
 # @Last Modified by:   tan
-# @Last Modified time: 2015-08-21 19:37:00
+# @Last Modified time: 2015-08-24 12:58:33
 
 import requests
 import re
@@ -75,9 +75,10 @@ class DNSPayload(object):
 
         if (wan_url.find('WanDynamicIpCfgRpm') > 0):
             payload = self.dyna_payload(dns1, dns2)
-        elif (wan_url.find('PPPoECfgAdvRpm') > 0):
+        elif (wan_url.find('PPPoECfgRpm') > 0):
             payload = self.ppp_payload(dns1, dns2)
         else:
+            print wan_url
             print "can not find the dns change method in this router"
             return
 
@@ -88,7 +89,6 @@ class DNSPayload(object):
         if (r.content.find(dns1) != -1):
             print 'success'
         else:
-            print r.content
             print 'change dns fail'
 
     def dyna_payload(self, dns1, dns2):
@@ -104,8 +104,8 @@ class DNSPayload(object):
         return payload
 
 if __name__ == '__main__':
-    dns_payload = DNSPayload('192.168.1.253', 80, 'admin', '123456', 0)
-    dns_payload.dns_seting('192.168.1.1', '192.168.2.2')
+    dns_payload = DNSPayload('192.168.1.1', 80, 'admin', 'admin', 0)
+    dns_payload.dns_seting('192.168.2.1', '192.168.2.2')
 
 
         
