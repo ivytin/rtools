@@ -9,7 +9,7 @@ Working with:
 - DD-WRT
 _ _ _
 
-#####usage：
+#### usage：
 ```bash
 $python command.py -h --help		view help
 $python command.py --debug <ip_addr> <port> <username> <passwd>		test router info crawling func
@@ -34,4 +34,3 @@ the input file for dns setting format:
 ip, port, username, passwd, type_index
 58.152.26.245, 80, admin, admin, 2
 ```
-
