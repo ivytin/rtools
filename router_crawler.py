@@ -3,7 +3,7 @@
 # @Author: tan
 # @Date:   2015-08-13 14:18:37
 # @Last Modified by:   tan
-# @Last Modified time: 2015-08-21 17:38:44
+# @Last Modified time: 2015-08-25 13:06:17
 
 import requests
 from requests.sessions import Session
@@ -190,7 +190,8 @@ class RouterCrawler(object):
         url = 'http://' + self.router_addr + ':' + str(self.router_port)
         print url
         router_info = {
-                'url': url,
+                'ip': self.router_addr,
+                'port': self.router_port,
                 'status': '',
                 'router_server': '',
                 'router_realm': '',
@@ -198,7 +199,8 @@ class RouterCrawler(object):
                 'passwd': '',
                 'fm_version': '',
                 'hm_version': '',
-                'dns': ''
+                'dns': '',
+                'type_index': ''
                 }
         s = Session()
         try:
@@ -225,6 +227,7 @@ class RouterCrawler(object):
             if (fingerprint != '' or r.content != ''):
                 router_id = self.typeRec(fingerprint, r.content)
                 if router_id >= 0:
+                    router_info['type_index'] = router_id
                     r = self.db.table("INFO_MATCH").select('INFO_URL', 
                                                       'FIREWARE', 'FIREWARE_INDEX', 
                                                       'HARDWARE', 'HARDWARE_INDEX', 

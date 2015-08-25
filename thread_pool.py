@@ -3,7 +3,7 @@
 # @Author: tan
 # @Date:   2015-08-17 19:00:47
 # @Last Modified by:   tan
-# @Last Modified time: 2015-08-24 13:00:43
+# @Last Modified time: 2015-08-25 12:59:06
 
 import csv
 import requests
@@ -86,7 +86,8 @@ class WorkManager(object):
         router_row = []
         #由于Python字典是无序的，这里手动遍历，获得全部内容，格式如下
         # router_info = {
-        #         'url': url,
+        #         'ip': ip,
+        #         'port': port,
         #         'status': '',
         #         'router_server': '',
         #         'router_realm': '',
@@ -94,9 +95,10 @@ class WorkManager(object):
         #         'passwd': '',
         #         'fm_version': '',
         #         'hm_version': '',
-        #         'dns': ''
+        #         'dns': '',
+        #         'type_index': 0
         #         }
-        columns = ['url', 'status', 'router_server', 'router_realm', 'username', 'passwd', 'fm_version', 'hm_version', 'dns']
+        columns = ['ip', 'port', 'status', 'router_server', 'router_realm', 'username', 'passwd', 'fm_version', 'hm_version', 'dns', 'type_index']
         try:
             for column in columns:
                 if column in router_info:

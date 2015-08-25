@@ -61,11 +61,16 @@ if debug_flag:
     # except Exception, e:
     #     pass
     # else:
-    print args[0], args[1]
+    for arg in xrange(3):
+        try:
+            print args[arg]
+        except Exception, e:
+            print 'args should include ip, port, username, passwd'
+            sys.exit(-1)
     test_crawl = RouterCrawler(addr = args[0], port = int(args[1]), name = args[2], passwd = args[3], debug = True)
     ret = test_crawl.crawl()
-    #for (k, v) in ret.items():
-    #    print '%s = ' % k, v
+    for (k, v) in ret.items():
+        print '%s = ' % k, v
     sys.exit(0)
 
 data_in_path = options.in_file_path
