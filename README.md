@@ -7,7 +7,12 @@ A router infomation crawler with multithreading(thread pool) design. Also suppor
 Working with: 
 - TP-Link WR serial router
 - DD-WRT
-_ _ _
+- D-Link ADSL
+- D-Link DIR-505
+
+To do:
+- [ ] Add support for more types
+- - -
 
 #### usage：
 ```bash
@@ -26,7 +31,7 @@ the output file format：
 ip, port, status, server, www-authentication, username, passwd, info, type_index
 14.199.15.34, 80, admin, admin
 ```
-**Notice: ** the last column *type-index* is the index number for this router type in the sqlite database, it will help the dns setting function to search the dns changing methods in the database.
+*Notice: * the last column *type-index* is the index number for this router type in the sqlite database, it will help the dns setting function to search the dns changing methods in the database.
 
 - - -
 the input file for dns setting format:

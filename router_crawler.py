@@ -3,7 +3,7 @@
 # @Author: tan
 # @Date:   2015-08-13 14:18:37
 # @Last Modified by:   tan
-# @Last Modified time: 2015-08-25 13:06:17
+# @Last Modified time: 2015-08-26 11:36:49
 
 import requests
 from requests.sessions import Session
@@ -105,7 +105,7 @@ class RouterCrawler(object):
     def typeRec(self, fingerprint, raw):
         """区分路由器品牌，决定抓取方式，目前支持TP-Link, D-Link, DD-WRT"""
 
-        router_res = [('DD-WRT', 'DD\W?WRT'), ('TP-LINK', 'TP\W?LINK'), ('D-LINK', 'D\W?LINK')]
+        router_res = [('DD-WRT', 'DD\W?WRT'), ('TP-LINK', 'TP\W?LINK'), ('D-LINK', 'D\W?LINK'), ('D-LINK', 'DSL')]
         #print raw
         #注意，DD-WRT必须出现在TP-Link或其他品牌之前，因为DD-WRT中包含其他品牌型号，导致识别错误
         fingerprint = fingerprint + raw
@@ -115,7 +115,7 @@ class RouterCrawler(object):
             if match:
                 rs = self.db.table("MODULE_MATCH").select('ID', 'FINGERPRINT').where(DataCondition(("=", "AND"), TYPE_INDEX = self.ROUTER_BRAND[m_re[0]]), DataCondition((">", "AND"), WEIGHT = 0)).fetchall()
                 for r in rs:
-                    r_pattern = re.compile(r[1])
+                    r_pattern = re.compile(r[1], re.S | re.I)
                     match = r_pattern.search(fingerprint)
                     if match:
                         return r[0]
@@ -155,6 +155,7 @@ class RouterCrawler(object):
                 break
             except Exception, e:
                 router_info['status'] = 'crwaling timeout'
+                #raise e
                 return
 
         if (r.status_code == 401):
@@ -226,19 +227,66 @@ class RouterCrawler(object):
             #print r.content
             if (fingerprint != '' or r.content != ''):
                 router_id = self.typeRec(fingerprint, r.content)
+                if self.debug_flag:
+                    print router_id
                 if router_id >= 0:
                     router_info['type_index'] = router_id
-                    r = self.db.table("INFO_MATCH").select('INFO_URL', 
-                                                      'FIREWARE', 'FIREWARE_INDEX', 
-                                                      'HARDWARE', 'HARDWARE_INDEX', 
-                                                      'DNS', 'DNS_INDEX', 
-                                                      'AUTH_COOKIE', 'OTHER_COOKIE',
-                                                      'REFERER'
-                                                      ).where(DataCondition(("=", "AND"), ID = router_id)).fetchone()
-                    if r == []:
-                        router_info['status'] = 'unsupport module'
+                    '''对于非常规登录方式路由器必须单独给出登录及信息抓取方式
+                    '''
+                    if router_id == 50:
+                        #D-Link DIR-505
+                        router_info['hm_version'] = 'DIR-505'
+                        username = base64.b64encode(self.router_name).replace('=', 'A')
+                        passwd = base64.b64encode(self.router_passwd).replace('=', 'A')
+                        data = 'request=login&admin_user_name=' + username + '&admin_user_pwd=' + passwd + '&user_type=0'
+                        try:
+                            login = s.post('http://192.168.0.1/my_cgi.cgi?0.7204311818502432', data = data)
+                            if login.content.find('default'):
+                                router_info['status'] = 'success'
+                                router_info['username'] = self.router_name
+                                router_info['passwd'] = self.router_passwd
+                                info = s.get()
+                            else:
+                                router_info['status'] = 'wrong passwd'
+                        except Exception,e:
+                            pass
+                        data = 'request=load_settings&table_name=wan_info&table_name=fw_ver&table_name=hw_ver'
+                        try:
+                            dir_505_info = s.post('http://192.168.0.1/my_cgi.cgi?0.23814993476113056', data = data)
+                            r = self.db.table("INFO_MATCH").select(
+                                                          'FIREWARE', 'FIREWARE_INDEX', 
+                                                          'HARDWARE', 'HARDWARE_INDEX', 
+                                                          'DNS', 'DNS_INDEX', 
+                                                          ).where(DataCondition(("=", "AND"), ID = router_id)).fetchone()
+                            fm_pattern = re.compile(r[0])
+                            match = fm_pattern.search(dir_505_info.content)
+                            if match:
+                                router_info['fm_version'] = match.group(r[1])
+
+                            hm_pattern = re.compile(r[2])
+                            match = hm_pattern.search(dir_505_info.content)
+                            if match:
+                                router_info['hm_version'] += match.group(r[3])
+
+                            dns_pattern = re.compile(r[4])
+                            match = dns_pattern.search(dir_505_info.content)
+                            if match:
+                                router_info['dns'] = match.group(r[5])
+                        except Exception,e:
+                            pass
                     else:
-                        router_info = self.infoCrawl(s, r, url, router_info)
+                        #常规路由器
+                        r = self.db.table("INFO_MATCH").select('INFO_URL', 
+                                                          'FIREWARE', 'FIREWARE_INDEX', 
+                                                          'HARDWARE', 'HARDWARE_INDEX', 
+                                                          'DNS', 'DNS_INDEX', 
+                                                          'AUTH_COOKIE', 'OTHER_COOKIE',
+                                                          'REFERER'
+                                                          ).where(DataCondition(("=", "AND"), ID = router_id)).fetchone()
+                        if r == []:
+                            router_info['status'] = 'unsupport module'
+                        else:
+                            router_info = self.infoCrawl(s, r, url, router_info)
                 else:
                     router_info['status'] = "can't recognize this module"
             else:
@@ -251,12 +299,12 @@ class RouterCrawler(object):
 
 if __name__ == '__main__':
     """测试用例"""
-    test_addr = '183.178.166.42'
+    test_addr = '192.168.0.1'
     test_port = 80
     test_name = 'admin'
-    test_passwd = '123456'
+    test_passwd = 'admin'
 
-    test_router_info_grab = RouterCrawler(addr = test_addr, port = test_port, name = test_name, passwd = test_passwd)
+    test_router_info_grab = RouterCrawler(addr = test_addr, port = test_port, name = test_name, passwd = test_passwd, debug=True)
     ret = test_router_info_grab.crawl()
     for (k, v) in ret.items():
         print '%s = ' % k, v
