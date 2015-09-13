@@ -12,11 +12,20 @@ class ErrorTimeout(Exception):
     def __str__(self):
         return repr(self.value)
 
+class ErrorPassword(Exception):
+    """self define exception: wrong password"""
+    def __init__(self):
+        self.value = 'Wrong password'
+
+    def __str__(self):
+        return repr(self.value)
+
 class BaseCrawler(object):
     """The base class of all crawler"""
     def __init__(self, addr, port, username, password, session, debug=False):
         """，包括router_name， router_passwd， router_addr， router_port"""
-        self.router_info = dict()
+        self.addr = addr
+        self.port = port
         self.try_username = username
         self.try_passwd = password
         self.session = session

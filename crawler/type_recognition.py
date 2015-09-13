@@ -15,8 +15,8 @@ class TypeRecognition(object):
     type_res['TP-LINK'] = []
     type_res['D-LINK'] = []
 
-    def __init__(self):
-        pass
+    server = ''
+    realm = ''
 
     def connect(self, session, url, times):
         for x in xrange(times):
@@ -45,6 +45,6 @@ class TypeRecognition(object):
                     type_pattern = re.compile(type_re[1], re.S | re.I)
                     brand_match = type_pattern.search(fingerprint)
                     if brand_match:
-                        return type_re[0]
+                        return type_re[0], self.server, self.realm
 
         return -1
