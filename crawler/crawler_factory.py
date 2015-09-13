@@ -46,4 +46,7 @@ class CrawlerFactory(object):
         except ErrorPassword, e:
             self.router_info['status'] = 'wrong password'
             return
-        crawler.get_info()
+        dns_info, firmware, hardware = crawler.get_info()
+        self.router_info['dns'] = dns_info
+        self.router_info['firmware'] = firmware
+        self.router_info['hardware'] = hardware

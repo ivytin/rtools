@@ -9,6 +9,7 @@ from base_crawler import ErrorTimeout
 from base_crawler import ErrorPassword
 
 class Crawler(BaseCrawler):
+    """crawler for TP-Link WR serial routers"""
     def __init__(self, addr, port, username, password, session, debug=False):
         BaseCrawler.__init__(self, addr, port, username, password, session, debug=False)
         self.res['dns'] = ['/userRpm/StatusRpm.htm', 'var wanPara = new Array(.+?)"([\d\.]+? , [\d\.]+?)"', 2]

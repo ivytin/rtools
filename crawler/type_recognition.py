@@ -12,8 +12,13 @@ class TypeRecognition(object):
 
     type_res = dict()
     type_res['DD-WRT'] = []
-    type_res['TP-LINK'] = []
-    type_res['D-LINK'] = []
+    type_res['TP-LINK'] = [
+        ['tp_link_wr', 'TP\W?LINK WR']
+    ]
+    type_res['D-LINK'] = [
+        ['d_link_dsl2520', '252'],
+        ['d_link_dir505', 'D-LINK SYSTEMS, INC.(.+?)location.href = "login_real.htm"']
+    ]
 
     server = ''
     realm = ''
