@@ -30,23 +30,36 @@ class CrawlerFactory(object):
 
     def produce(self):
         try:
-            type, server, realm= TypeRecognition.type_recognition(self.router_info['addr'], self.router_info['port'], self.session)
+            type, server, realm = TypeRecognition.type_recognition(self.router_info['addr'], self.router_info['port'], self.session)
         except ErrorTimeout, e:
             self.router_info['status'] = 'offline'
-            return
+            return self.router_info
         else:
             if server != '':
                 self.router_info['server'] = server
             if realm != '':
                 self.router_info['realm'] = realm
 
+        if type == -1:
+            self.router_info['status'] == 'unknow type'
+            return self.router_info
+
         crawler_module = __import__(type)
         try:
             crawler = crawler_module.Crawler(self.router_info['addr'], self.router_info['port'], self.try_username, self.try_password, self.session)
         except ErrorPassword, e:
             self.router_info['status'] = 'wrong password'
-            return
+            return self.router_info
+        except ErrorTimeout, e:
+            self.router_info['status'] = 'offline'
+            return self.router_info
+
         dns_info, firmware, hardware = crawler.get_info()
         self.router_info['dns'] = dns_info
         self.router_info['firmware'] = firmware
         self.router_info['hardware'] = hardware
+        if dns_info != '' and firmware != '' and hardware != '':
+            self.router_info['status'] = 'success'
+        else:
+            self.router_info['status'] = 'match fail'
+        return self.router_info
