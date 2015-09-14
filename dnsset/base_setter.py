@@ -17,22 +17,15 @@ class ErrorPassword(Exception):
 
     def __str__(self):
         return repr(self.value)
-
-class BaseCrawler(object):
-    """The base class of all crawler"""
-    def __init__(self, addr, port, username, password, session, debug=False):
-        """，包括router_name， router_passwd， router_addr， router_port"""
+# fldsajl
+class BaseSetter(object):
+    """Automatic change routers' dns settings"""
+    def __init__(self, addr, port, username, passwd, session):
         self.addr = addr
         self.port = port
         self.try_username = username
-        self.try_passwd = password
+        self.try_passwd = passwd
         self.session = session
-
-        self.res = dict()
-        self.res['dns'] = []
-        self.res['firmware'] = []
-        self.res['dns'] = []
-
         self.headers = dict()
 
     def connect(self, url, times):
@@ -63,21 +56,5 @@ class BaseCrawler(object):
                 pass
         raise ErrorTimeout
 
-    def get_info(self):
+    def dns_set(self, *dns):
         pass
-
-    def get_dns(self):
-        pass
-
-    def get_firmware(self):
-        pass
-
-    def get_hardware(self):
-        pass
-
-
-
-
-
-
-

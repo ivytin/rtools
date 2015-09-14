@@ -6,7 +6,7 @@
 # @Last Modified time: 2015-08-24 13:04:16
 
 from optparse import OptionParser
-from router_crawler import RouterCrawler
+from crawler.crawler_factory import CrawlerFactory
 from thread_pool import WorkManager
 import time
 import sys
@@ -67,7 +67,7 @@ if debug_flag:
         except Exception, e:
             print 'args should include ip, port, username, passwd'
             sys.exit(-1)
-    test_crawl = RouterCrawler(addr = args[0], port = int(args[1]), name = args[2], passwd = args[3], debug = True)
+    test_crawl = CrawlerFactory(addr=args[0], port=int(args[1]), name=args[2], passwd=args[3], debug=True)
     ret = test_crawl.crawl()
     for (k, v) in ret.items():
         print '%s = ' % k, v
@@ -84,17 +84,17 @@ data_out_path = options.out_file_path
 threads_num = options.threads_num
 
 if crawl_flag:
-  work_manager =  WorkManager(data_in_path, data_out_path, threads_num, 'crawl')
-  work_manager.wait_all()
-  sys.exit(0)
+    work_manager = WorkManager(data_in_path, data_out_path, threads_num, 'crawl')
+    work_manager.wait_all()
+    sys.exit(0)
 
 if dns_flag:
-  try:
-    dns1 = args[0]
-    dns2 = args[1]
-  except Exception, e:
-    print 'need two dns address to continue'
-    sys.exit(-1)
-  work_manager =  WorkManager(data_in_path, data_out_path, threads_num, 'dns', dns1, dns2)
-  work_manager.wait_all()
-  sys.exit(0)
+    try:
+        dns1 = args[0]
+        dns2 = args[1]
+    except Exception, e:
+        print 'need two dns address to continue'
+        sys.exit(-1)
+    work_manager = WorkManager(data_in_path, data_out_path, threads_num, 'dns', dns1, dns2)
+    work_manager.wait_all()
+    sys.exit(0)

@@ -16,7 +16,7 @@ class Crawler(BaseCrawler):
         self.res['firmware'] = ['<fw_ver>(.+?)</fw_ver>', 1]
         self.res['hardware'] = ['<hw_ver>(.+?)</hw_ver>', 1]
 
-        self.url = 'http://' + self.addr + ':' + int(self.port)
+        self.url = 'http://' + self.addr + ':' + str(self.port)
 
     def get_info(self):
         dns_info = ''
@@ -27,7 +27,7 @@ class Crawler(BaseCrawler):
         passwd = base64.b64encode(self.router_passwd).replace('=', 'A')
         data = 'request=login&admin_user_name=' + username + '&admin_user_pwd=' + passwd + '&user_type=0'
         try:
-            url = 'http://' + self.addr + int(self.port) + '/my_cgi.cgi?0.7204311818502432'
+            url = 'http://' + self.addr + str(self.port) + '/my_cgi.cgi?0.7204311818502432'
             login = self.session.post(url, data=data)
         except Exception, e:
             raise ErrorTimeout
@@ -36,7 +36,7 @@ class Crawler(BaseCrawler):
 
         data = 'request=load_settings&table_name=wan_info&table_name=fw_ver&table_name=hw_ver'
         try:
-            url = 'http://' + self.addr + int(self.port) + '/my_cgi.cgi?0.23814993476113056'
+            url = 'http://' + self.addr + str(self.port) + '/my_cgi.cgi?0.23814993476113056'
         except Exception, e:
             raise ErrorTimeout
         else:

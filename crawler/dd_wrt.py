@@ -19,7 +19,7 @@ class Crawler(BaseCrawler):
         firmware = ''
         hardware = ''
 
-        dns_url = 'http://' + self.addr + ':' + int(self.port) + self.res['dns'][0]
+        dns_url = 'http://' + self.addr + ':' + str(self.port) + self.res['dns'][0]
         try:
             r = self.connect(dns_url, 3)
         except ErrorTimeout, e:
@@ -30,7 +30,7 @@ class Crawler(BaseCrawler):
             if dns_match:
                 dns_info = dns_match.group(self.res['dns'][2])
 
-        firmware_url = 'http://' + self.addr + ':' + int(self.port) + self.res['firmware'][0]
+        firmware_url = 'http://' + self.addr + ':' + str(self.port) + self.res['firmware'][0]
         if firmware_url == dns_url:
             firmware_pattern = re.compile(self.res['firmware'][1], re.I | re.S)
             firmware_match = firmware_pattern.search(r.context)
@@ -47,7 +47,7 @@ class Crawler(BaseCrawler):
                 if firmware_match:
                     firmware = firmware_match.group(self.res['firmware'][2])
 
-        hardware_url = 'http://' + self.addr + ':' + int(self.port) + self.res['hardware'][0]
+        hardware_url = 'http://' + self.addr + ':' + str(self.port) + self.res['hardware'][0]
         if hardware_url == firmware_url:
             hardware_pattern = re.compile(self.res['hardware'][1], re.I | re.S)
             hardware_match = hardware_pattern.search(r.context)

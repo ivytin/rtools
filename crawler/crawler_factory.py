@@ -11,8 +11,8 @@ class CrawlerFactory(object):
     """product specifical type crawler"""
     session = requests.session()
     router_info = dict()
-    router_info['addr'] = addr
-    router_info['port'] = port
+    router_info['addr'] = ''
+    router_info['port'] = 0
     router_info['status'] = 'unknow'
     router_info['server'] = ''
     router_info['realm'] = ''
@@ -26,7 +26,9 @@ class CrawlerFactory(object):
     def __init__(self, addr, port, username, password):
         self.try_username = username
         self.try_password = password
-        pass
+
+        self.router_info['addr'] = addr
+        self.router_info['port'] = port
 
     def produce(self):
         try:
@@ -60,6 +62,4 @@ class CrawlerFactory(object):
         self.router_info['hardware'] = hardware
         if dns_info != '' and firmware != '' and hardware != '':
             self.router_info['status'] = 'success'
-        else:
-            self.router_info['status'] = 'match fail'
         return self.router_info

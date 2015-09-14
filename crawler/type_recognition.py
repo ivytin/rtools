@@ -34,21 +34,21 @@ class TypeRecognition(object):
 
     @staticmethod
     def type_recognition(self, addr, port, session):
-        url = 'http://' + addr + ':' + int(port)
+        url = 'http://' + addr + ':' + str(port)
         r = self.connect(session, url, 3)
         if 'server' in r.headers:
                 server = r.headers['server']
         if 'www-authenticate' in r.headers:
                 realm = r.headers['www-authenticate']
-        fingerprint = server + realm
+        fingerprstr = server + realm
         for brand_re in self.brand_res:
             brand_pattern = re.compile(brand_re[1], re.I)
-            brand_match = brand_pattern.search(fingerprint)
+            brand_match = brand_pattern.search(fingerprstr)
             if brand_match:
                 type_re_list = self.type_res[brand_re[0]]
                 for type_re in type_re_list:
                     type_pattern = re.compile(type_re[1], re.S | re.I)
-                    brand_match = type_pattern.search(fingerprint)
+                    brand_match = type_pattern.search(fingerprstr)
                     if brand_match:
                         return type_re[0], self.server, self.realm
 

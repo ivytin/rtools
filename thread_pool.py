@@ -6,13 +6,12 @@
 # @Last Modified time: 2015-08-25 12:59:06
 
 import csv
-import requests
 import Queue
 import threading
 import time
 import socket
 import sys
-from router_crawler import RouterCrawler
+from crawler.crawler_factory import CrawlerFactory
 from dns_payload import DNSPayload
 
 class WorkManager(object):
@@ -61,8 +60,8 @@ class WorkManager(object):
         #try:
         #print target
         try:
-            crawler_thread = RouterCrawler(target[0], target[1], target[2], target[3])
-            router_info = crawler_thread.crawl()
+            crawler_thread = CrawlerFactory(target[0], target[1], target[2], target[3])
+            router_info = crawler_thread.produce()
             self.data_out(self.data_out_path, router_info)
         except Error_addr, e:
             print e
@@ -84,21 +83,8 @@ class WorkManager(object):
         csvfile = file(file_path, 'ab')
         writer = csv.writer(csvfile)
         router_row = []
-        #由于Python字典是无序的，这里手动遍历，获得全部内容，格式如下
-        # router_info = {
-        #         'ip': ip,
-        #         'port': port,
-        #         'status': '',
-        #         'router_server': '',
-        #         'router_realm': '',
-        #         'username': '',
-        #         'passwd': '',
-        #         'fm_version': '',
-        #         'hm_version': '',
-        #         'dns': '',
-        #         'type_index': 0
-        #         }
-        columns = ['ip', 'port', 'status', 'router_server', 'router_realm', 'username', 'passwd', 'fm_version', 'hm_version', 'dns', 'type_index']
+        # 由于Python字典是无序的，这里手动遍历，获得全部内容，格式如下
+        columns = ['addr', 'port', 'status', 'server', 'realm', 'type', 'username', 'password', 'firmware', 'hardware', 'dns']
         try:
             for column in columns:
                 if column in router_info:
@@ -128,7 +114,7 @@ class WorkManager(object):
                         continue
                 if x == 1:
                     if (0 < int(line[1]) and int(line[1]) < 65432):
-                        target.append(80)
+                        target.append(int(line[1]))
                         continue
                     else:
                         print 'line ' + str(row_len) + ': port error'
