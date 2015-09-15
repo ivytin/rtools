@@ -11,9 +11,11 @@ class TypeRecognition(object):
     brand_res = [('DD-WRT', 'DD\W?WRT'), ('TP-LINK', 'TP\W?LINK'), ('D-LINK', 'D\W?LINK'), ('D-LINK', 'DSL')]
 
     type_res = dict()
-    type_res['DD-WRT'] = []
+    type_res['DD-WRT'] = [
+        ['dd_wrt', 'DD\W?WRT']
+    ]
     type_res['TP-LINK'] = [
-        ['tp_link_wr', 'TP\W?LINK WR']
+        ['tp_link_wr', 'LINK.+?WR']
     ]
     type_res['D-LINK'] = [
         ['d_link_dsl2520', '252'],
@@ -32,15 +34,14 @@ class TypeRecognition(object):
                 pass
         raise ErrorTimeout
 
-    @staticmethod
     def type_recognition(self, addr, port, session):
         url = 'http://' + addr + ':' + str(port)
-        r = self.connect(session, url, 3)
+        r = self.connect(session, url, 1)
         if 'server' in r.headers:
-                server = r.headers['server']
+            self.server = r.headers['server']
         if 'www-authenticate' in r.headers:
-                realm = r.headers['www-authenticate']
-        fingerprstr = server + realm
+            self.realm = r.headers['www-authenticate']
+        fingerprstr = self.server + self.realm + r.content
         for brand_re in self.brand_res:
             brand_pattern = re.compile(brand_re[1], re.I)
             brand_match = brand_pattern.search(fingerprstr)
@@ -51,5 +52,4 @@ class TypeRecognition(object):
                     brand_match = type_pattern.search(fingerprstr)
                     if brand_match:
                         return type_re[0], self.server, self.realm
-
-        return -1
+        return '', '', ''

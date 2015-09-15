@@ -20,7 +20,7 @@ class ErrorPassword(Exception):
 
 class BaseCrawler(object):
     """The base class of all crawler"""
-    def __init__(self, addr, port, username, password, session, debug=False):
+    def __init__(self, addr, port, username, password, session):
         """，包括router_name， router_passwd， router_addr， router_port"""
         self.addr = addr
         self.port = port

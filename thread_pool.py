@@ -15,13 +15,13 @@ from crawler.crawler_factory import CrawlerFactory
 from dns_payload import DNSPayload
 
 class WorkManager(object):
-    """线程池管理类，用于管理路由器抓取线程"""
+    """thread pool manager class"""
 
     FUNC_NAME = ['crawl', 'dns']
 
     @staticmethod 
     def valid_ip(address):
-        """验证IP是否合法"""
+        """valid ip"""
         try: 
             socket.inet_aton(address)
             return True
@@ -29,13 +29,12 @@ class WorkManager(object):
             return False
 
     def __init__(self, data_in_path, data_out_path, thread_num, func, *dns):
-        """初始化任务队列和线程队列"""
+        """init task queue and thread queue"""
         self.file_lock = threading.Lock()
         self.work_queue = Queue.Queue()
         self.threads = []
         self.target_list = []
         target_num = self.data_in(data_in_path)
-        #print target_num
         self.data_out_path = data_out_path
         self.__init_work_queue(func, target_num, self.target_list, *dns)
         self.__init_thread_pool(thread_num)
@@ -53,23 +52,15 @@ class WorkManager(object):
     def __init_thread_pool(self, thread_num):
         for x in xrange(thread_num):
             self.threads.append(Work(self.work_queue))
-            #print len(self.threads)
 
     def crawler(self, target):
-    #target sample: ['ip', port, 'username', 'passwd']
-        #try:
-        #print target
-        try:
-            crawler_thread = CrawlerFactory(target[0], target[1], target[2], target[3])
-            router_info = crawler_thread.produce()
-            self.data_out(self.data_out_path, router_info)
-        except Error_addr, e:
-            print e
-        # for (k,v) in  router_info.items():
-        #     print k, ' ', v
+        # target sample: ['ip', port, 'username', 'passwd']
+        crawler_thread = CrawlerFactory(target[0], target[1], target[2], target[3], False)
+        router_info = crawler_thread.produce()
+        self.data_out(self.data_out_path, router_info)
 
     def dns(self, target):
-    #target sample: [['ip', port, 'username', 'passwd'], '8.8.4.4', '8.8.8.8']
+        # target sample: [['ip', port, 'username', 'passwd'], '8.8.4.4', '8.8.8.8']
         dns1 = target[1]
         dns2 = target[2]
         if self.valid_ip(dns1) == False or self.valid_ip(dns2) == False:
@@ -79,26 +70,18 @@ class WorkManager(object):
         dns_thread.dns_seting(dns1, dns2)
 
     def data_out(self, file_path, router_info):
+        router_row = []
+        columns = ['addr', 'port', 'status', 'server', 'realm', 'type', 'username', 'password', 'firmware', 'hardware', 'dns']
+        for column in columns:
+            router_row.append(router_info[column])
         self.file_lock.acquire()
         csvfile = file(file_path, 'ab')
         writer = csv.writer(csvfile)
-        router_row = []
-        # 由于Python字典是无序的，这里手动遍历，获得全部内容，格式如下
-        columns = ['addr', 'port', 'status', 'server', 'realm', 'type', 'username', 'password', 'firmware', 'hardware', 'dns']
-        try:
-            for column in columns:
-                if column in router_info:
-                    router_row.append(router_info[column])
-                else:
-                    router_info.append('')
-            writer.writerow(router_row)
-        except Exception, e:
-            pass
+        writer.writerow(router_row)
         csvfile.close()
         self.file_lock.release()
 
     def data_in(self, file_path):
-        self.tartget_list = []
         csvfile = file(file_path, 'rb')
         reader = csv.reader(csvfile)
         row_len = 0
@@ -106,14 +89,14 @@ class WorkManager(object):
             target = []
             for x in xrange(len(line)):
                 if x == 0:
-                    if (self.valid_ip(line[0])):
+                    if self.valid_ip(line[0]):
                         target.append(line[0])
                         continue
                     else:
                         print 'line ' + str(row_len) + ': ip address error'
                         continue
                 if x == 1:
-                    if (0 < int(line[1]) and int(line[1]) < 65432):
+                    if int(line[1]) and int(line[1]) < 65432:
                         target.append(int(line[1]))
                         continue
                     else:
@@ -134,12 +117,11 @@ class WorkManager(object):
     def wait_all(self):
         for x in self.threads:
             while x.isAlive():
-                #x.join()
-                print self.check_queue(), 'threads reaming'
+                print self.check_queue(), 'tasks reaming'
                 time.sleep(5)
 
 class Work(threading.Thread):
-    """路由器信息抓取线程"""
+    """worker thread class"""
 
     def __init__(self, work_queue):
         threading.Thread.__init__(self)
@@ -152,15 +134,13 @@ class Work(threading.Thread):
                 func, target = self.work_queue.get(block=False)
                 func(target)
                 self.work_queue.task_done()
-            except Exception, e:
-                #raise e
-                #抛出异常，说明任务队列已经被清空
+            except Queue.Empty, e:
+                # except empty, means tasks all done
                 break
 
 if __name__ == '__main__':
-
-    #data_in_path = './ip.csv'
+    """Test this unit"""
     data_in_path = './dns.csv'
     data_out_path = './out.csv'
-    work_manager =  WorkManager(data_in_path, data_out_path, 3, 'dns', '192.168.1.9', '192.168.2.3')
+    work_manager = WorkManager(data_in_path, data_out_path, 3, 'dns', '192.168.1.9', '192.168.2.3')
     work_manager.wait_all()
