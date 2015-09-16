@@ -12,6 +12,7 @@ Working with:
 
 To do:
 - [ ] Add support for more types
+
 - - -
 
 #### usage：
@@ -31,7 +32,8 @@ the output file format：
 ip, port, status, server, www-authentication, username, password, dns, type
 14.199.15.34, 80, admin, admin, 202.120.2.101, dd_wrt
 ```
-*Notice: * the last column *type* is the router model type detected by type_recognition.py, it will help the dns setting function to find the dns changing methods.
+
+**Notice:** the last column *type* is the router model type detected by type_recognition.py, it will help the dns setting function to find the dns changing methods.
 
 - - -
 the input file for dns setting format:
