@@ -12,7 +12,7 @@ import time
 import socket
 import sys
 from crawler.crawler_factory import CrawlerFactory
-from dns_payload import DNSPayload
+from dnsset.dnsset_factory import DnssetFactory
 
 class WorkManager(object):
     """thread pool manager class"""
@@ -60,14 +60,15 @@ class WorkManager(object):
         self.data_out(self.data_out_path, router_info)
 
     def dns(self, target):
-        # target sample: [['ip', port, 'username', 'passwd'], '8.8.4.4', '8.8.8.8']
+        # target sample: [['ip', port, 'username', 'passwd', 'type], '8.8.4.4', '8.8.8.8']
         dns1 = target[1]
         dns2 = target[2]
-        if self.valid_ip(dns1) == False or self.valid_ip(dns2) == False:
+        dns = [dns1, dns2]
+        if (not self.valid_ip(dns1)) or (not self.valid_ip(dns2)):
             print 'illegal dns address'
             sys.exit(-1)
-        dns_thread = DNSPayload(target[0][0], target[0][1], target[0][2], target[0][3], target[0][4])
-        dns_thread.dns_seting(dns1, dns2)
+        dns_thread = DnssetFactory(target[0][0], target[0][1], target[0][2], target[0][3], target[0][4], dns)
+        dns_thread.produce()
 
     def data_out(self, file_path, router_info):
         router_row = []

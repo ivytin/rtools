@@ -15,7 +15,6 @@ class CrawlerFactory(object):
         self.try_password = password
         self.addr = addr
 
-
         self.session = requests.session()
         self.router_info = dict()
         self.router_info['addr'] = addr
@@ -35,7 +34,7 @@ class CrawlerFactory(object):
     def produce(self):
         recognition = TypeRecognition()
         try:
-            type, server, realm = recognition.type_recognition(self.router_info['addr'],
+            router_type, server, realm = recognition.type_recognition(self.router_info['addr'],
                                                                self.router_info['port'], self.session)
         except ErrorTimeout, e:
             print self.addr + ': fail, connect timeout'
@@ -47,13 +46,15 @@ class CrawlerFactory(object):
             if realm:
                 self.router_info['realm'] = realm
 
-        if not type:
+        if not router_type:
             print self.addr + ': fail, unknown type'
-            self.router_info['status'] == 'unknown type'
+            self.router_info['status'] = 'unknown type'
+            if self.debug:
+                print self.router_info
             return self.router_info
 
-        self.router_info['type'] = type
-        crawler_module = __import__(type)
+        self.router_info['type'] = router_type
+        crawler_module = __import__(router_type)
 
         try:
             crawler = crawler_module.Crawler(self.router_info['addr'], self.router_info['port'],

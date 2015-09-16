@@ -17,9 +17,10 @@ class ErrorPassword(Exception):
 
     def __str__(self):
         return repr(self.value)
-# fldsajl
+
 class BaseSetter(object):
     """Automatic change routers' dns settings"""
+
     def __init__(self, addr, port, username, passwd, session):
         self.addr = addr
         self.port = port
@@ -56,5 +57,5 @@ class BaseSetter(object):
                 pass
         raise ErrorTimeout
 
-    def dns_set(self, *dns):
+    def dns_set(self, dns):
         pass

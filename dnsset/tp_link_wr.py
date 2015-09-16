@@ -23,7 +23,7 @@ class DnsSetter(BaseSetter):
         self.ppp_para = 'lcpMru=1480&manual=2&dnsserver=[dns1]&dnsserver2=[dns2]&Save=save&Advanced=Advanced'
         self.ppp_ref = '/userRpm/PPPoECfgAdvRpm.htm?Advanced=%B8%DF%BC%B6%C9%E8%D6%C3&wan=0'
 
-    def dns_set(self, *dns):
+    def dns_set(self, dns):
         url = 'http://' + self.addr + ':' + str(self.port) + self.wan_type_search
         self.headers['Referer'] = 'http://' + self.addr + ':' + str(self.port)
         try:
@@ -55,14 +55,15 @@ class DnsSetter(BaseSetter):
             return
 
         dns_url = wan_url + payload
-        r = self.connect_times(dns_url)
-        if r:
+        try:
+            r = self.connect_times(dns_url)
+        except ErrorTimeout:
+            print self.addr + ': fail, no response'
+        else:
             if r.content.find(dns[0]):
                 print self.addr + ': success'
             else:
                 print self.addr + ': fail, change dns fail'
-        else:
-            print self.addr + ': fail, no response'
 
     def dyna_payload(self, dns1, dns2):
         self.headers['Referer'] = 'http://' + self.addr + ':' + str(self.port) + self.dyna_ref
@@ -75,3 +76,8 @@ class DnsSetter(BaseSetter):
         payload = self.ppp_para.replace('[dns1]', dns1)
         payload = payload.replace('[dns2]', dns2)
         return payload
+
+if __name__ == '__main__':
+    """Test this unit"""
+    req = __import__('requests')
+    test = DnsSetter('192.168.1.1', 80, 'admin', 'admin', req.session)
