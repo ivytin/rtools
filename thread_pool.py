@@ -118,7 +118,7 @@ class WorkManager(object):
     def wait_all(self):
         for x in self.threads:
             while x.isAlive():
-                print self.check_queue(), 'tasks reaming'
+                print self.check_queue(), 'tasks remaining.'
                 time.sleep(5)
 
 class Work(threading.Thread):

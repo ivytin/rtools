@@ -18,9 +18,9 @@ class DnssetFactory(object):
         self.dns = dns
 
     def produce(self):
-        dnsset_module = __import__(type)
+        dnsset_module = __import__(self.type)
         setter = dnsset_module.DnsSetter(self.addr, self.port, self.try_username, self.try_passwd, self.session)
-        setter.set(self.dns)
+        setter.dns_set(self.dns)
 
 if __name__ == '__main__':
     """Test DNS setter factory"""

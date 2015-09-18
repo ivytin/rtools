@@ -42,14 +42,12 @@ crawl_flag = options.crawl
 dns_flag = options.dns
 debug_flag = options.debug
 
-sys.path.append('./crawler')
-sys.path.append('./dnsset')
-
 if (crawl_flag or dns_flag or debug_flag) is False:
     print 'no mode chosen, program will exit'
     sys.exit(-1)
 
 if debug_flag:
+    sys.path.append('./crawler')
     for arg in xrange(4):
         try:
             print args[arg]
@@ -71,11 +69,13 @@ data_out_path = options.out_file_path
 threads_num = options.threads_num
 
 if crawl_flag:
+    sys.path.append('./crawler')
     work_manager = WorkManager(data_in_path, data_out_path, threads_num, 'crawl')
     work_manager.wait_all()
     sys.exit(0)
 
 if dns_flag:
+    sys.path.append('./dnsset')
     try:
         dns1 = args[0]
         dns2 = args[1]

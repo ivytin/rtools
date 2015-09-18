@@ -27,13 +27,13 @@ class DnsSetter(BaseSetter):
         url = 'http://' + self.addr + ':' + str(self.port) + self.wan_type_search
         self.headers['Referer'] = 'http://' + self.addr + ':' + str(self.port)
         try:
-            r = self.connect_auth_with_headers(url, 3)
+            r = self.connect_auth_with_headers(url, 2)
         except ErrorTimeout, e:
-            print self.addr + ': fail, connect timeout'
+            self.print_with_lock(self.addr + ': fail, connect timeout')
             return
 
         if r.status_code == 401:
-            print self.addr + ': fail, wrong password'
+            self.print_with_lock(self.addr + ': fail, wrong password')
             return
 
         ref_re = 'location.href="(.+?)"'
@@ -43,7 +43,7 @@ class DnsSetter(BaseSetter):
         if match:
             wan_url = 'http://' + self.addr + ':' + str(self.port) + match.group(ref_re_index)
         else:
-            print self.addr + ': fail, can not find the wan_url'
+            self.print_with_lock(self.addr + ': fail, can not find the wan_url')
             return
 
         if wan_url.find('WanDynamicIpCfgRpm'):
@@ -51,19 +51,19 @@ class DnsSetter(BaseSetter):
         elif wan_url.find('PPPoECfgRpm'):
             payload = self.ppp_payload(dns[0], dns[1])
         else:
-            print self.addr + ': fail, can not find the dns change method in this router'
+            self.printLock(self.addr + ': fail, can not find the dns change method in this router')
             return
 
         dns_url = wan_url + payload
         try:
-            r = self.connect_times(dns_url)
+            r = self.connect_auth_with_headers(dns_url, 2)
         except ErrorTimeout:
-            print self.addr + ': fail, no response'
+            self.print_with_lock(self.addr + ': fail, no response')
         else:
             if r.content.find(dns[0]):
-                print self.addr + ': success'
+                self.print_with_lock(self.addr + ': success')
             else:
-                print self.addr + ': fail, change dns fail'
+                self.print_with_lock(self.addr + ': fail, change dns fail')
 
     def dyna_payload(self, dns1, dns2):
         self.headers['Referer'] = 'http://' + self.addr + ':' + str(self.port) + self.dyna_ref

@@ -3,12 +3,14 @@
 # @Author: 'tan'
 
 import requests
+import threading
 from type_recognition import TypeRecognition
 from base_crawler import ErrorTimeout
 from base_crawler import ErrorPassword
 
 class CrawlerFactory(object):
     """product specifical type crawler"""
+    printLock = threading.Lock()
 
     def __init__(self, addr, port, username, password, debug):
         self.try_username = username
@@ -31,13 +33,18 @@ class CrawlerFactory(object):
 
         self.debug = debug
 
+    def print_with_lock(self, str):
+        self.printLock.acquire()
+        print str
+        self.printLock.release()
+
     def produce(self):
         recognition = TypeRecognition()
         try:
             router_type, server, realm = recognition.type_recognition(self.router_info['addr'],
                                                                self.router_info['port'], self.session)
         except ErrorTimeout, e:
-            print self.addr + ': fail, connect timeout'
+            self.print_with_lock(self.addr + ': fail, connect timeout')
             self.router_info['status'] = 'offline'
             return self.router_info
         else:
@@ -47,7 +54,7 @@ class CrawlerFactory(object):
                 self.router_info['realm'] = realm
 
         if not router_type:
-            print self.addr + ': fail, unknown type'
+            self.print_with_lock(self.addr + ': fail, unknown type')
             self.router_info['status'] = 'unknown type'
             if self.debug:
                 print self.router_info
@@ -62,17 +69,17 @@ class CrawlerFactory(object):
             if self.debug:
                 print 'requests headers:\n', crawler.headers
         except ErrorTimeout, e:
-            print self.addr + ': fail, connect timeout'
+            self.print_with_lock(self.addr + ': fail, connect timeout')
             self.router_info['status'] = 'offline'
             return self.router_info
 
         try:
             dns_info, firmware, hardware = crawler.get_info()
         except ErrorPassword, e:
-            print self.addr + ': fail, wrong password'
+            self.print_with_lock(self.addr + ': fail, wrong password')
             self.router_info['status'] = 'wrong password'
         except ErrorTimeout, e:
-            print self.addr + ': fail, timeout'
+            self.print_with_lock(self.addr + ': fail, timeout')
             self.router_info['status'] = 'incomplete'
         else:
             self.router_info['username'] = self.try_username
@@ -81,7 +88,7 @@ class CrawlerFactory(object):
             self.router_info['firmware'] = firmware
             self.router_info['hardware'] = hardware
             if dns_info or firmware or hardware:
-                print self.addr + ': success'
+                self.print_with_lock(self.addr + ': success')
                 self.router_info['status'] = 'success'
 
             if self.debug:

@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 # @Author: 'tan'
 
+import threading
+
 class ErrorTimeout(Exception):
     """self define exception: requests page time out"""
     def __init__(self):
@@ -20,6 +22,7 @@ class ErrorPassword(Exception):
 
 class BaseSetter(object):
     """Automatic change routers' dns settings"""
+    printLock = threading.Lock()
 
     def __init__(self, addr, port, username, passwd, session):
         self.addr = addr
@@ -29,10 +32,15 @@ class BaseSetter(object):
         self.session = session
         self.headers = dict()
 
+    def print_with_lock(self, str):
+        self.printLock.acquire()
+        print str
+        self.printLock.release()
+
     def connect(self, url, times):
         for x in xrange(times):
             try:
-                r = self.session.get(url, timeout=3, allow_redirects=True)
+                r = self.session.get(url, timeout=2, allow_redirects=True)
                 return r
             except Exception, e:
                 pass
@@ -41,7 +49,7 @@ class BaseSetter(object):
     def connect_with_headers(self, url, times):
         for x in xrange(times):
             try:
-                r = self.session.get(url, timeout=3, allow_redirects=True, headers=self.headers)
+                r = self.session.get(url, timeout=2, allow_redirects=True, headers=self.headers)
                 return r
             except Exception, e:
                 pass
@@ -51,7 +59,7 @@ class BaseSetter(object):
         for x in xrange(times):
             try:
                 r = self.session.get(url, auth=(self.try_username, self.try_passwd),
-                                     timeout=3, allow_redirects=True, headers=self.headers)
+                                     timeout=2, allow_redirects=True, headers=self.headers)
                 return r
             except Exception, e:
                 pass
