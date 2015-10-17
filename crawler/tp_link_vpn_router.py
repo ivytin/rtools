@@ -9,7 +9,7 @@ from base_crawler import ErrorTimeout
 from base_crawler import ErrorPassword
 
 class Crawler(BaseCrawler):
-    """crawler for TP-Link WR serial routers"""
+    """crawler for TP-Link VPN serial routers"""
     def __init__(self, addr, port, username, password, session):
         BaseCrawler.__init__(self, addr, port, username, password, session)
         self.res['dns'] = ['/userRpm/StatusRpm.htm', 'var wanPara = new Array(.+?)"([\d\.]+? , [\d\.]+?)"', 2]
@@ -18,7 +18,6 @@ class Crawler(BaseCrawler):
 
         auth_cookie = base64.b64encode(self.try_username + ':' + self.try_passwd)
         self.headers = {
-            b'Cookie': 'tLargeScreenP=1; subType=pcSub; Authorization=Basic ' + auth_cookie,
             b'User-Agent': b'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0',
             b'Accept-Language': b'en-US',
             b'Referer': '',

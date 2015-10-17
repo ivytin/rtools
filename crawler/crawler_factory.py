@@ -44,7 +44,7 @@ class CrawlerFactory(object):
             router_type, server, realm = recognition.type_recognition(self.router_info['addr'],
                                                                self.router_info['port'], self.session)
         except ErrorTimeout, e:
-            self.print_with_lock(self.addr + ': fail, connect timeout')
+            self.print_with_lock(self.addr + ': fail, connect timeout at type recognition')
             self.router_info['status'] = 'offline'
             return self.router_info
         else:
@@ -52,6 +52,9 @@ class CrawlerFactory(object):
                 self.router_info['server'] = server
             if realm:
                 self.router_info['realm'] = realm
+
+        if self.debug:
+            print "router type: " + router_type
 
         if not router_type:
             self.print_with_lock(self.addr + ': fail, unknown type')
@@ -66,10 +69,8 @@ class CrawlerFactory(object):
         try:
             crawler = crawler_module.Crawler(self.router_info['addr'], self.router_info['port'],
                                              self.try_username, self.try_password, self.session)
-            if self.debug:
-                print 'requests headers:\n', crawler.headers
         except ErrorTimeout, e:
-            self.print_with_lock(self.addr + ': fail, connect timeout')
+            self.print_with_lock(self.addr + ': fail, connect timeout at crawler try connect')
             self.router_info['status'] = 'offline'
             return self.router_info
 
@@ -79,7 +80,7 @@ class CrawlerFactory(object):
             self.print_with_lock(self.addr + ': fail, wrong password')
             self.router_info['status'] = 'wrong password'
         except ErrorTimeout, e:
-            self.print_with_lock(self.addr + ': fail, timeout')
+            self.print_with_lock(self.addr + ': fail, timeout during crawling')
             self.router_info['status'] = 'incomplete'
         else:
             self.router_info['username'] = self.try_username

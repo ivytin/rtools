@@ -8,18 +8,29 @@ from base_crawler import ErrorTimeout
 class TypeRecognition(object):
     """Recognize the router type"""
     # attention! DD-WRT must be the first type to match, because if cotains other types' key string
-    brand_res = [('DD-WRT', 'DD\W?WRT'), ('TP-LINK', 'TP\W?LINK'), ('D-LINK', 'D\W?LINK'), ('D-LINK', 'DSL')]
+    brand_res = [('DD-WRT', 'DD\W?WRT'), ('TP-LINK', 'TP\W?LINK'),
+                 ('D-LINK', 'D\W?LINK'), ('D-LINK', 'DSL'), ('D-LINK', 'DCS'),
+                 ('ASUS', 'RT-N'), ('Linksys', 'WRT')]
 
     type_res = dict()
     type_res['DD-WRT'] = [
         ['dd_wrt', 'DD\W?WRT']
     ]
     type_res['TP-LINK'] = [
-        ['tp_link_wr', 'LINK.+?WR']
+        ['tp_link_wr', 'LINK.+?WR'],
+        ['tp_link_wr', 'LINK.+?3G/4G'],
+        ['tp_link_vpn_router', 'LINK.+?Gigabit']
     ]
     type_res['D-LINK'] = [
         ['d_link_dsl2520', '252'],
+        ['d_link_dcs', 'dcs'],
         ['d_link_dir505', 'D-LINK SYSTEMS, INC.(.+?)location.href = "login_real.htm"']
+    ]
+    type_res['ASUS'] = [
+        ['asus_rt', 'RT-N']
+    ]
+    type_res['Linksys'] = [
+        ['linksys_wrt', 'WRT']
     ]
 
     server = ''

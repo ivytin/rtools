@@ -9,16 +9,15 @@ from base_crawler import ErrorTimeout
 from base_crawler import ErrorPassword
 
 class Crawler(BaseCrawler):
-    """crawler for TP-Link WR serial routers"""
+    """crawler for D-Link DCS serial camera"""
     def __init__(self, addr, port, username, password, session):
         BaseCrawler.__init__(self, addr, port, username, password, session)
-        self.res['dns'] = ['/userRpm/StatusRpm.htm', 'var wanPara = new Array(.+?)"([\d\.]+? , [\d\.]+?)"', 2]
-        self.res['firmware'] = ['/userRpm/StatusRpm.htm', 'var statusPara = new Array.+?"(.+?)"', 1]
-        self.res['hardware'] = ['/userRpm/StatusRpm.htm', 'var statusPara = new Array.+?".+?".+?"(.+?)"', 1]
+        self.res['dns'] = ['/eng/admin/st_device.cgi', '<dns1>(.+?)</dns1>', 1]
+        self.res['firmware'] = ['/eng/admin/st_device.cgi', '<version>(.+?)</version>', 1]
+        self.res['hardware'] = ['/eng/admin/st_device.cgi', '<product>(.+?)</product>', 1]
 
         auth_cookie = base64.b64encode(self.try_username + ':' + self.try_passwd)
         self.headers = {
-            b'Cookie': 'tLargeScreenP=1; subType=pcSub; Authorization=Basic ' + auth_cookie,
             b'User-Agent': b'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0',
             b'Accept-Language': b'en-US',
             b'Referer': '',

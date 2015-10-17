@@ -24,6 +24,7 @@ class BaseCrawler(object):
         """，包括router_name， router_passwd， router_addr， router_port"""
         self.addr = addr
         self.port = port
+        self.url = 'http://' + addr + ':' + str(port)
         self.try_username = username
         self.try_passwd = password
         self.session = session
