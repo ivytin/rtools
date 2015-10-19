@@ -22,7 +22,7 @@ class Crawler(BaseCrawler):
             b'Accept-Language': b'en-US',
             b'Referer': '',
                         }
-        self.url = 'http://' + self.addr
+        self.url = 'http://' + self.addr + ':' + str(port)
 
     def get_info(self):
         dns_info = ''

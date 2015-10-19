@@ -9,16 +9,16 @@ from base_crawler import ErrorTimeout
 from base_crawler import ErrorPassword
 
 class Crawler(BaseCrawler):
-    """crawler for TP-Link WR serial routers"""
+    """crawler for Netgear jwnr serial routers"""
     def __init__(self, addr, port, username, password, session):
         BaseCrawler.__init__(self, addr, port, username, password, session)
-        self.res['dns'] = ['/userRpm/StatusRpm.htm', 'var wanPara = new Array(.+?)"([\d\.]+? , [\d\.]+?)"', 2]
-        self.res['firmware'] = ['/userRpm/StatusRpm.htm', 'var statusPara = new Array.+?"(.+?)"', 1]
-        self.res['hardware'] = ['/userRpm/StatusRpm.htm', 'var statusPara = new Array.+?".+?".+?"(.+?)"', 1]
+        self.res['dns1'] = ['/RST_status.htm', 'var info_get_dns1="(.+?)";']
+        self.res['dns2'] = ['/RST_status.htm', 'var info_get_dns2="(.+?)";']
+        self.res['firmware'] = ['/RST_status.htm', '<TD nowrap>V([\d\._]+?)</TD>', 1]
+        self.res['hardware'] = ['/RST_status.htm', "var product_id='(.+?)';", 1]
 
         auth_cookie = base64.b64encode(self.try_username + ':' + self.try_passwd)
         self.headers = {
-            b'Cookie': 'tLargeScreenP=1; subType=pcSub; Authorization=Basic ' + auth_cookie,
             b'User-Agent': b'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0',
             b'Accept-Language': b'en-US',
             b'Referer': '',
@@ -34,17 +34,21 @@ class Crawler(BaseCrawler):
         if r.status_code == 403:
             raise ErrorPassword
 
-        dns_url = 'http://' + self.addr + ':' + str(self.port) + self.res['dns'][0]
+        dns_url = 'http://' + self.addr + ':' + str(self.port) + self.res['dns1'][0]
         self.headers['Referer'] = self.url
         try:
             r = self.connect_auth_with_headers(dns_url, 1)
         except ErrorTimeout, e:
             pass
         else:
-            dns_pattern = re.compile(self.res['dns'][1], re.I | re.S)
-            dns_match = dns_pattern.search(r.content)
-            if dns_match:
-                dns_info = dns_match.group(self.res['dns'][2])
+            dns_pattern1 = re.compile(self.res['dns1'][1], re.I | re.S)
+            dns_match1 = dns_pattern1.search(r.content)
+            if dns_match1:
+                dns_info += dns_match1.group(1) + ' '
+            dns_pattern2 = re.compile(self.res['dns2'][1], re.I | re.S)
+            dns_match2 = dns_pattern2.search(r.content)
+            if dns_match2:
+                dns_info += dns_match2.group(1)
 
         firmware_url = 'http://' + self.addr + ':' + str(self.port) + self.res['firmware'][0]
         if firmware_url == dns_url:

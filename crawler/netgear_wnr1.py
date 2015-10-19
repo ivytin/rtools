@@ -12,9 +12,9 @@ class Crawler(BaseCrawler):
     """crawler for TP-Link WR serial routers"""
     def __init__(self, addr, port, username, password, session):
         BaseCrawler.__init__(self, addr, port, username, password, session)
-        self.res['dns'] = ['/userRpm/StatusRpm.htm', 'var wanPara = new Array(.+?)"([\d\.]+? , [\d\.]+?)"', 2]
-        self.res['firmware'] = ['/userRpm/StatusRpm.htm', 'var statusPara = new Array.+?"(.+?)"', 1]
-        self.res['hardware'] = ['/userRpm/StatusRpm.htm', 'var statusPara = new Array.+?".+?".+?"(.+?)"', 1]
+        self.res['dns'] = ['/RST_status.htm', 'Domain Name Server</b></td><td>(.+?)<BR/>(.+?)</td>']
+        self.res['firmware'] = ['/RST_status.htm', 'Firmware Version</b></td><td>(.+?)</td>', 1]
+        self.res['hardware'] = ['/RST_status.htm', 'Hardware Version</b></td><td>(.+?)</td>', 1]
 
         auth_cookie = base64.b64encode(self.try_username + ':' + self.try_passwd)
         self.headers = {
@@ -44,7 +44,7 @@ class Crawler(BaseCrawler):
             dns_pattern = re.compile(self.res['dns'][1], re.I | re.S)
             dns_match = dns_pattern.search(r.content)
             if dns_match:
-                dns_info = dns_match.group(self.res['dns'][2])
+                dns_info = dns_match.group(1) + ' ' + dns_match.group(2)
 
         firmware_url = 'http://' + self.addr + ':' + str(self.port) + self.res['firmware'][0]
         if firmware_url == dns_url:

@@ -9,8 +9,12 @@ class TypeRecognition(object):
     """Recognize the router type"""
     # attention! DD-WRT must be the first type to match, because if cotains other types' key string
     brand_res = [('DD-WRT', 'DD\W?WRT'), ('TP-LINK', 'TP\W?LINK'),
-                 ('D-LINK', 'D\W?LINK'), ('D-LINK', 'DSL'), ('D-LINK', 'DCS'),
-                 ('ASUS', 'RT-N'), ('Linksys', 'WRT')]
+                 ('D-LINK', 'D\W?LINK'), ('D-LINK', 'DSL'), ('D-LINK', 'DCS'), ('D-LINK', 'DI-\d'),
+                 ('ASUS', 'RT-N'), ('ASUS', 'RT-G'),
+                 ('Linksys', 'WRT'), ('Mecury', 'Wireless N Router MW'),
+                 ('Tenda', '11N wireless broadband router'), ('Tenda', 'Tenda'),
+                 ['Surecom', 'Broadband Router'],
+                 ('Cisco', 'X2000'), ('Netgear', 'Netgear')]
 
     type_res = dict()
     type_res['DD-WRT'] = [
@@ -24,13 +28,34 @@ class TypeRecognition(object):
     type_res['D-LINK'] = [
         ['d_link_dsl2520', '252'],
         ['d_link_dcs', 'dcs'],
-        ['d_link_dir505', 'D-LINK SYSTEMS, INC.(.+?)location.href = "login_real.htm"']
+        ['d_link_dir505', 'D-LINK SYSTEMS, INC.(.+?)location.href = "login_real.htm"'],
+        ['d_link_di5', 'DI-5'],
+        ['d_link_di6', 'DI-6']
     ]
     type_res['ASUS'] = [
-        ['asus_rt', 'RT-N']
+        ['asus_rt', 'RT-N'],
+        ['asus_rt', 'RT-G']
     ]
     type_res['Linksys'] = [
         ['linksys_wrt', 'WRT']
+    ]
+    type_res['Mecury'] = [
+        ['mecury_wm', 'Wireless N Router MW']
+    ]
+    type_res['Tenda'] = [
+        ['tenda', '11N wireless broadband router'],
+        ['tenda', 'tenda']
+    ]
+    type_res['Surecom'] = [
+        ['surecom', 'Broadband Router']
+    ]
+    type_res['Cisco'] = [
+        ['cisco_x2000', 'X2000']
+    ]
+    type_res['Netgear'] = [
+        ['netgear_jwnr2000', 'jwnr2000'],
+        ['netgear_wgr6', 'WGR'],
+        ['netgear_wnr1', 'WNR']
     ]
 
     server = ''

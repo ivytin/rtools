@@ -12,13 +12,12 @@ class Crawler(BaseCrawler):
     """crawler for TP-Link WR serial routers"""
     def __init__(self, addr, port, username, password, session):
         BaseCrawler.__init__(self, addr, port, username, password, session)
-        self.res['dns'] = ['/userRpm/StatusRpm.htm', 'var wanPara = new Array(.+?)"([\d\.]+? , [\d\.]+?)"', 2]
-        self.res['firmware'] = ['/userRpm/StatusRpm.htm', 'var statusPara = new Array.+?"(.+?)"', 1]
-        self.res['hardware'] = ['/userRpm/StatusRpm.htm', 'var statusPara = new Array.+?".+?".+?"(.+?)"', 1]
+        self.res['dns'] = ['/st_device.html', 'DNS[^\.]+?([\d\.]+[\d\.]+[\d\.]+[\d\.]+)', 1]
+        self.res['firmware'] = ['/st_device.html', '</font>.+?font>\r\n(.+?)\r\n.+?((mon)|(tues)|(wed)|(thurs)|(fri))', 1]
+        self.res['hardware'] = ['/st_device.html', '<TITLE>(.+?)</TITLE>', 1]
 
         auth_cookie = base64.b64encode(self.try_username + ':' + self.try_passwd)
         self.headers = {
-            b'Cookie': 'tLargeScreenP=1; subType=pcSub; Authorization=Basic ' + auth_cookie,
             b'User-Agent': b'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0',
             b'Accept-Language': b'en-US',
             b'Referer': '',

@@ -12,9 +12,8 @@ class Crawler(BaseCrawler):
     """crawler for TP-Link WR serial routers"""
     def __init__(self, addr, port, username, password, session):
         BaseCrawler.__init__(self, addr, port, username, password, session)
-        self.res['dns'] = ['/userRpm/StatusRpm.htm', 'var wanPara = new Array(.+?)"([\d\.]+? , [\d\.]+?)"', 2]
-        self.res['firmware'] = ['/userRpm/StatusRpm.htm', 'var statusPara = new Array.+?"(.+?)"', 1]
-        self.res['hardware'] = ['/userRpm/StatusRpm.htm', 'var statusPara = new Array.+?".+?".+?"(.+?)"', 1]
+        self.res['dns'] = ['/Status_Router.asp', 'share.dns.+?<B>(.+?)<', 1]
+        self.res['firmware'] = ['/Status_Router.asp', 'share.firmwarever.+?(v\d.+?)<', 1]
 
         auth_cookie = base64.b64encode(self.try_username + ':' + self.try_passwd)
         self.headers = {
@@ -63,24 +62,7 @@ class Crawler(BaseCrawler):
                 if firmware_match:
                     firmware = firmware_match.group(self.res['firmware'][2])
 
-        hardware_url = 'http://' + self.addr + ':' + str(self.port) + self.res['hardware'][0]
-        if hardware_url == firmware_url:
-            hardware_pattern = re.compile(self.res['hardware'][1], re.I | re.S)
-            hardware_match = hardware_pattern.search(r.content)
-            if hardware_match:
-                hardware = hardware_match.group(self.res['hardware'][2])
-        else:
-            try:
-                r = self.connect_auth_with_headers(hardware_url, 1)
-            except ErrorTimeout, e:
-                pass
-            else:
-                hardware_pattern = re.compile(self.res['hardware'][1], re.I | re.S)
-                hardware_match = hardware_pattern.search(r.content)
-                if hardware_match:
-                    hardware = hardware_match.group(self.res['hardware'][2])
-
-        return dns_info, firmware, hardware
+        return dns_info, firmware, 'x2000'
 
 if __name__ == '__main__':
     """Test this unit"""
