@@ -13,7 +13,7 @@ class TypeRecognition(object):
                  ('ASUS', 'RT-N'), ('ASUS', 'RT-G'),
                  ('Linksys', 'WRT'), ('Mecury', 'Wireless N Router MW'),
                  ('Tenda', '11N wireless broadband router'), ('Tenda', 'Tenda'),
-                 ['Surecom', 'Broadband Router'],
+                 ['Surecom', 'Broadband Router'], ('Edimax', 'Default: admin/1234'),
                  ('Cisco', 'X2000'), ('Netgear', 'Netgear')]
 
     type_res = dict()
@@ -55,7 +55,11 @@ class TypeRecognition(object):
     type_res['Netgear'] = [
         ['netgear_jwnr2000', 'jwnr2000'],
         ['netgear_wgr6', 'WGR'],
+        ['netgear_wgr6', 'WNR3500L'],
         ['netgear_wnr1', 'WNR']
+    ]
+    type_res['Edimax'] = [
+        ['edimax', 'Default: admin/1234']
     ]
 
     server = ''
