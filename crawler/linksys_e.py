@@ -9,15 +9,15 @@ from base_crawler import ErrorTimeout
 from base_crawler import ErrorPassword
 
 class Crawler(BaseCrawler):
-    """crawler for Edimax serial routers"""
+    """crawler for Linksys WRT serial routers"""
     def __init__(self, addr, port, username, password, session):
         BaseCrawler.__init__(self, addr, port, username, password, session)
-        self.res['dns'] = ['/status.asp', 'temp_dns1="(.+?)";', 1]
-        self.res['firmware'] = ['/status.asp', 'dw\(FirmwareVersion\)</script></td>.+?>(.+?)</td>', 1]
+        self.res['dns'] = ['/Status_Router.asp', 'document.write\("DNS"\).+?<TD class=FUNFIELD><B>(.+?)</B>', 1]
+        self.res['firmware'] = ['/Status_Router.asp', 'document.write\("Firmware Version"\).+?<TD class=FUNFIELD><B>(.+?)<', 1]
+        self.res['hardware'] = ['/Status_Router.asp', '<TD class=MODELNAME>(.+?)</TD>', 1]
 
         auth_cookie = base64.b64encode(self.try_username + ':' + self.try_passwd)
         self.headers = {
-            b'Cookie': 'tLargeScreenP=1; subType=pcSub; Authorization=Basic ' + auth_cookie,
             b'User-Agent': b'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0',
             b'Accept-Language': b'en-US',
             b'Referer': '',
@@ -27,6 +27,7 @@ class Crawler(BaseCrawler):
     def get_info(self):
         dns_info = ''
         firmware = ''
+        hardware = ''
         r = self.connect_auth_with_headers(self.url, 1)
 
         if r.status_code == 403:
@@ -61,7 +62,24 @@ class Crawler(BaseCrawler):
                 if firmware_match:
                     firmware = firmware_match.group(self.res['firmware'][2])
 
-        return dns_info, firmware, 'Edimax'
+        hardware_url = 'http://' + self.addr + ':' + str(self.port) + self.res['hardware'][0]
+        if hardware_url == firmware_url:
+            hardware_pattern = re.compile(self.res['hardware'][1], re.I | re.S)
+            hardware_match = hardware_pattern.search(r.content)
+            if hardware_match:
+                hardware = hardware_match.group(self.res['hardware'][2])
+        else:
+            try:
+                r = self.connect_auth_with_headers(hardware_url, 1)
+            except ErrorTimeout, e:
+                pass
+            else:
+                hardware_pattern = re.compile(self.res['hardware'][1], re.I | re.S)
+                hardware_match = hardware_pattern.search(r.content)
+                if hardware_match:
+                    hardware = hardware_match.group(self.res['hardware'][2])
+
+        return dns_info, firmware, hardware
 
 if __name__ == '__main__':
     """Test this unit"""

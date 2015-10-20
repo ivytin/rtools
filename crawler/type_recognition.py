@@ -8,11 +8,12 @@ from base_crawler import ErrorTimeout
 class TypeRecognition(object):
     """Recognize the router type"""
     # attention! DD-WRT must be the first type to match, because if cotains other types' key string
-    brand_res = [('DD-WRT', 'DD\W?WRT'), ('TP-LINK', 'TP\W?LINK'),
+    brand_res = [('DD-WRT', 'DD\W?WRT'), ('TP-LINK', 'TP\W?LINK'), ('TP-LINK', 'TL-'),
                  ('D-LINK', 'D\W?LINK'), ('D-LINK', 'DSL'), ('D-LINK', 'DCS'), ('D-LINK', 'DI-\d'),
                  ('ASUS', 'RT-N'), ('ASUS', 'RT-G'),
-                 ('Linksys', 'WRT'), ('Mecury', 'Wireless N Router MW'),
-                 ('Tenda', '11N wireless broadband router'), ('Tenda', 'Tenda'),
+                 ('Linksys', 'WRT'), ('Linksys', 'Linksys'),
+                 ('Mecury', 'Wireless N Router MW'),
+                 ('Tenda', '11N wireless broadband router'), ('Tenda', 'Tenda'), ('Tenda', 'NAT router'),
                  ['Surecom', 'Broadband Router'], ('Edimax', 'Default: admin/1234'),
                  ('Cisco', 'X2000'), ('Netgear', 'Netgear')]
 
@@ -21,6 +22,7 @@ class TypeRecognition(object):
         ['dd_wrt', 'DD\W?WRT']
     ]
     type_res['TP-LINK'] = [
+        ['tp_link_wr', 'TL-WR'],
         ['tp_link_wr', 'LINK.+?WR'],
         ['tp_link_wr', 'LINK.+?3G/4G'],
         ['tp_link_vpn_router', 'LINK.+?Gigabit']
@@ -37,12 +39,14 @@ class TypeRecognition(object):
         ['asus_rt', 'RT-G']
     ]
     type_res['Linksys'] = [
+        ['linksys_e', 'E1200'],
         ['linksys_wrt', 'WRT']
     ]
     type_res['Mecury'] = [
         ['mecury_wm', 'Wireless N Router MW']
     ]
     type_res['Tenda'] = [
+        ['tenda', 'NAT router'],
         ['tenda', '11N wireless broadband router'],
         ['tenda', 'tenda']
     ]
