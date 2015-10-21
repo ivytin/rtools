@@ -8,10 +8,11 @@ from base_crawler import BaseCrawler
 from base_crawler import ErrorTimeout
 from base_crawler import ErrorPassword
 
+
 class Crawler(BaseCrawler):
     """crawler for D-Link DCS serial camera"""
-    def __init__(self, addr, port, username, password, session):
-        BaseCrawler.__init__(self, addr, port, username, password, session)
+    def __init__(self, addr, port, username, password, session, debug):
+        BaseCrawler.__init__(self, addr, port, username, password, session, debug)
         self.res['dns'] = ['/eng/admin/st_device.cgi', '<dns1>(.+?)</dns1>', 1]
         self.res['firmware'] = ['/eng/admin/st_device.cgi', '<version>(.+?)</version>', 1]
         self.res['hardware'] = ['/eng/admin/st_device.cgi', '<product>(.+?)</product>', 1]

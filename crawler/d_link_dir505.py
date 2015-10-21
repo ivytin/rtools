@@ -11,8 +11,8 @@ from base_crawler import ErrorPassword
 
 class Crawler(BaseCrawler):
     """crawler for D-Link DIR-505 router"""
-    def __init__(self, addr, port, username, password, session, debug=False):
-        BaseCrawler.__init__(self, addr, port, username, password, session, debug=False)
+    def __init__(self, addr, port, username, password, session, debug):
+        BaseCrawler.__init__(self, addr, port, username, password, session, debug)
         self.res['dns'] = ['<wan_dns>(.+?)</wan_dns>', 1]
         self.res['firmware'] = ['<fw_ver>(.+?)</fw_ver>', 1]
         self.res['hardware'] = ['<hw_ver>(.+?)</hw_ver>', 1]
@@ -24,8 +24,8 @@ class Crawler(BaseCrawler):
         firmware = ''
         hardware = ''
 
-        username = base64.b64encode(self.router_name).replace('=', 'A')
-        passwd = base64.b64encode(self.router_passwd).replace('=', 'A')
+        username = base64.b64encode(self.try_username).replace('=', 'A')
+        passwd = base64.b64encode(self.try_passwd).replace('=', 'A')
         data = 'request=login&admin_user_name=' + username + '&admin_user_pwd=' + passwd + '&user_type=0'
         try:
             url = 'http://' + self.addr + str(self.port) + '/my_cgi.cgi?0.7204311818502432'
@@ -44,7 +44,7 @@ class Crawler(BaseCrawler):
             r = self.session.post(url, data=data)
 
             firmware_pattern = re.compile(self.res['firmware'][0])
-            firmware_match = fireware_pattern.search(r.content)
+            firmware_match = firmware_pattern.search(r.content)
             if firmware_match:
                 firmware = firmware_match.group(self.res['firmware'][1])
 

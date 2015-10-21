@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Author: tan
-# @Date:   2015-08-17 19:00:47
-# @Last Modified by:   tan
-# @Last Modified time: 2015-08-25 12:59:06
+# @Author: 'tan'
 
 import csv
 import Queue
@@ -13,6 +10,7 @@ import socket
 import sys
 from crawler.crawler_factory import CrawlerFactory
 from dnsset.dnsset_factory import DnssetFactory
+
 
 class WorkManager(object):
     """thread pool manager class"""
@@ -55,7 +53,7 @@ class WorkManager(object):
 
     def crawler(self, target):
         # target sample: ['ip', port, 'username', 'passwd']
-        crawler_thread = CrawlerFactory(target[0], target[1], target[2], target[3], False)
+        crawler_thread = CrawlerFactory(target[0], target[1], target[2], target[3])
         router_info = crawler_thread.produce()
         self.data_out(self.data_out_path, router_info)
 

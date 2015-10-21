@@ -8,15 +8,15 @@ from base_crawler import BaseCrawler
 from base_crawler import ErrorTimeout
 from base_crawler import ErrorPassword
 
+
 class Crawler(BaseCrawler):
     """crawler for ASUS RT serial routers"""
-    def __init__(self, addr, port, username, password, session):
-        BaseCrawler.__init__(self, addr, port, username, password, session)
+    def __init__(self, addr, port, username, password, session, debug):
+        BaseCrawler.__init__(self, addr, port, username, password, session, debug)
         self.res['dns'] = ['/tcpipwan.asp', 'name="dns1" class="input" size="18" maxlength="15" value=(.+?)>', 1]
         self.res['firmware'] = ['', 'name="firmver" value="(.+?)">', 1]
         self.res['hardware'] = ['', '<span id="helpname">(.+?)</span>', 1]
 
-        auth_cookie = base64.b64encode(self.try_username + ':' + self.try_passwd)
         self.headers = {
             b'User-Agent': b'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0',
             b'Accept-Language': b'en-US',
@@ -36,7 +36,7 @@ class Crawler(BaseCrawler):
         dns_url = 'http://' + self.addr + ':' + str(self.port) + self.res['dns'][0]
         self.headers['Referer'] = self.url
         try:
-            r = self.connect_auth_with_headers(dns_url, 1)
+            r = self.connect_auth_with_headers(dns_url, 2)
         except ErrorTimeout, e:
             pass
         else:

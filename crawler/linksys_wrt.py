@@ -11,8 +11,8 @@ from base_crawler import ErrorPassword
 
 class Crawler(BaseCrawler):
     """crawler for Linksys WRT serial routers"""
-    def __init__(self, addr, port, username, password, session):
-        BaseCrawler.__init__(self, addr, port, username, password, session)
+    def __init__(self, addr, port, username, password, session, debug):
+        BaseCrawler.__init__(self, addr, port, username, password, session, debug)
         self.res['dns'] = ['/Status_Router.asp', 'share.dns.+?<B>(.+?)<', 1]
         self.res['firmware'] = ['/Status_Router.asp', 'share.firmwarever.+?(v\d.+?)<', 1]
         self.res['hardware'] = ['/Status_Router.asp', 'share.routename.+?<b>(.+?)<', 1]

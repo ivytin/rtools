@@ -11,8 +11,8 @@ from base_crawler import ErrorPassword
 
 class Crawler(BaseCrawler):
     """crawler for Edimax serial routers"""
-    def __init__(self, addr, port, username, password, session):
-        BaseCrawler.__init__(self, addr, port, username, password, session)
+    def __init__(self, addr, port, username, password, session, debug):
+        BaseCrawler.__init__(self, addr, port, username, password, session, debug)
         self.res['dns'] = ['/status.asp', 'temp_dns1="(.+?)";', 1]
         self.res['firmware'] = ['/status.asp', 'dw\(FirmwareVersion\)</script></td>.+?>(.+?)</td>', 1]
 

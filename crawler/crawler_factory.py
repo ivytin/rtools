@@ -8,11 +8,12 @@ from type_recognition import TypeRecognition
 from base_crawler import ErrorTimeout
 from base_crawler import ErrorPassword
 
+
 class CrawlerFactory(object):
     """product specifical type crawler"""
     printLock = threading.Lock()
 
-    def __init__(self, addr, port, username, password, debug):
+    def __init__(self, addr, port, username, password, debug=False):
         self.try_username = username
         self.try_password = password
         self.addr = addr
@@ -59,29 +60,25 @@ class CrawlerFactory(object):
         if not router_type:
             self.print_with_lock(self.addr + ': fail, unknown type')
             self.router_info['status'] = 'unknown type'
+            self.router_info['username'] = self.try_username
+            self.router_info['password'] = self.try_password
+            self.router_info['type'] = 'unknown'
+            # crawler_module = __import__('unknown_type')
+            # crawler = crawler_module.Crawler(self.router_info['addr'], self.router_info['port'],
+            #                                  self.try_username, self.try_password, self.session, self.debug)
             if self.debug:
                 print self.router_info
             return self.router_info
 
         self.router_info['type'] = router_type
         crawler_module = __import__(router_type)
-
-        try:
-            crawler = crawler_module.Crawler(self.router_info['addr'], self.router_info['port'],
-                                             self.try_username, self.try_password, self.session)
-        except ErrorTimeout, e:
-            self.print_with_lock(self.addr + ': fail, connect timeout at crawler try connect')
-            self.router_info['status'] = 'offline'
-            return self.router_info
-
+        crawler = crawler_module.Crawler(self.router_info['addr'], self.router_info['port'],
+                                         self.try_username, self.try_password, self.session, self.debug)
         try:
             dns_info, firmware, hardware = crawler.get_info()
         except ErrorPassword, e:
             self.print_with_lock(self.addr + ': fail, wrong password')
             self.router_info['status'] = 'wrong password'
-        except ErrorTimeout, e:
-            self.print_with_lock(self.addr + ': fail, timeout during crawling')
-            self.router_info['status'] = 'incomplete'
         else:
             self.router_info['username'] = self.try_username
             self.router_info['password'] = self.try_password

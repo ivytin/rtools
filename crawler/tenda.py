@@ -11,8 +11,8 @@ from base_crawler import ErrorPassword
 
 class Crawler(BaseCrawler):
     """crawler for Tenda 11N routers"""
-    def __init__(self, addr, port, username, password, session):
-        BaseCrawler.__init__(self, addr, port, username, password, session)
+    def __init__(self, addr, port, username, password, session, debug):
+        BaseCrawler.__init__(self, addr, port, username, password, session, debug)
         self.res['dns1'] = ['/system_status.asp', 'dns1[^"]+"(.+?)"', 1]
         self.res['dns2'] = ['/system_status.asp', 'dns2[^"]+"(.+?)"', 1]
         self.res['firmware'] = ['/system_status.asp', 'run_code_ver[^"]+"(.+?)"', 1]

@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 # @Author: 'tan'
 
+import threading
+
 
 class ErrorTimeout(Exception):
     """self define exception: requests page time out"""
@@ -21,29 +23,27 @@ class ErrorPassword(Exception):
         return repr(self.value)
 
 
-class BaseCrawler(object):
-    """The base class of all crawler"""
-    def __init__(self, addr, port, username, password, session, debug):
-        """，including router_name， router_passwd， router_addr， router_port"""
+class BaseUpgrade(object):
+    """Automatic router's firmware"""
+    printLock = threading.Lock()
+
+    def __init__(self, addr, port, username, passwd, session, debug=False):
         self.addr = addr
         self.port = port
-        self.url = 'http://' + addr + ':' + str(port)
         self.try_username = username
-        self.try_passwd = password
+        self.try_passwd = passwd
         self.session = session
-        self.debug = debug
-
-        self.res = dict()
-        self.res['dns'] = []
-        self.res['firmware'] = []
-        self.res['dns'] = []
-
         self.headers = dict()
+
+    def print_with_lock(self, str):
+        self.printLock.acquire()
+        print str
+        self.printLock.release()
 
     def connect(self, url, times):
         for x in xrange(times):
             try:
-                r = self.session.get(url, timeout=3, allow_redirects=True)
+                r = self.session.get(url, timeout=2, allow_redirects=True)
                 return r
             except Exception, e:
                 pass
@@ -52,7 +52,7 @@ class BaseCrawler(object):
     def connect_with_headers(self, url, times):
         for x in xrange(times):
             try:
-                r = self.session.get(url, timeout=3, allow_redirects=True, headers=self.headers)
+                r = self.session.get(url, timeout=2, allow_redirects=True, headers=self.headers)
                 return r
             except Exception, e:
                 pass
@@ -62,27 +62,11 @@ class BaseCrawler(object):
         for x in xrange(times):
             try:
                 r = self.session.get(url, auth=(self.try_username, self.try_passwd),
-                                     timeout=3, allow_redirects=True, headers=self.headers)
+                                     timeout=2, allow_redirects=True, headers=self.headers)
                 return r
             except Exception, e:
                 pass
         raise ErrorTimeout
 
-    def get_info(self):
+    def upgrade_set(self, dns):
         pass
-
-    def get_dns(self):
-        pass
-
-    def get_firmware(self):
-        pass
-
-    def get_hardware(self):
-        pass
-
-
-
-
-
-
-

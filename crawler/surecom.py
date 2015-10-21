@@ -11,8 +11,8 @@ from base_crawler import ErrorPassword
 
 class Crawler(BaseCrawler):
     """crawler for Surecom serial routers"""
-    def __init__(self, addr, port, username, password, session):
-        BaseCrawler.__init__(self, addr, port, username, password, session)
+    def __init__(self, addr, port, username, password, session, debug):
+        BaseCrawler.__init__(self, addr, port, username, password, session, debug)
         self.res['dns'] = ['/Comm/Status.js', 'var va_DNSServer.+?(".+?".+?".+?")', 1]
 
         self.headers = {

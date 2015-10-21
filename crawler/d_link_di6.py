@@ -11,8 +11,8 @@ from base_crawler import ErrorPassword
 
 class Crawler(BaseCrawler):
     """crawler for D-Link 6 serial routers"""
-    def __init__(self, addr, port, username, password, session):
-        BaseCrawler.__init__(self, addr, port, username, password, session)
+    def __init__(self, addr, port, username, password, session, debug):
+        BaseCrawler.__init__(self, addr, port, username, password, session, debug)
         self.res['dns'] = ['/st_device.html', 'DNS[^\.]+?([\d\.]+[\d\.]+[\d\.]+[\d\.]+)', 1]
         self.res['firmware'] = ['/st_device.html', '</font>.+?font>\r\n(.+?)\r\n.+?((mon)|(tues)|(wed)|(thurs)|(fri))', 1]
         self.res['hardware'] = ['/st_device.html', '<TITLE>(.+?)</TITLE>', 1]

@@ -11,8 +11,8 @@ from base_crawler import ErrorPassword
 
 class Crawler(BaseCrawler):
     """crawler for Netgear JWNR serial routers"""
-    def __init__(self, addr, port, username, password, session):
-        BaseCrawler.__init__(self, addr, port, username, password, session)
+    def __init__(self, addr, port, username, password, session, debug):
+        BaseCrawler.__init__(self, addr, port, username, password, session, debug)
         self.res['dns1'] = ['/RST_status.htm', 'var info_get_dns1="(.+?)";']
         self.res['dns2'] = ['/RST_status.htm', 'var info_get_dns2="(.+?)";']
         self.res['firmware'] = ['/RST_status.htm', '<TD nowrap>V([\d\._]+?)</TD>', 1]

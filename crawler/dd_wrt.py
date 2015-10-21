@@ -9,8 +9,8 @@ from base_crawler import ErrorTimeout
 
 class Crawler(BaseCrawler):
     """crawler for DD-WRT routers"""
-    def __init__(self, addr, port, username, password, session):
-        BaseCrawler.__init__(self, addr, port, username, password, session)
+    def __init__(self, addr, port, username, password, session, debug):
+        BaseCrawler.__init__(self, addr, port, username, password, session, debug)
         self.res['dns'] = ['/userRpm/StatusRpm.htm', 'var wanPara = new Array(.+?)"([\d\.]+? , [\d\.]+?)"', 2]
         self.res['firmware'] = ['', 'openAboutWindow.+?>(.+?)</a>"', 1]
         self.res['hardware'] = ['', '>Capture\(status_router.sys_model.+?\n(.+?)&nbsp;', 1]

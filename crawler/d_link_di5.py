@@ -8,10 +8,11 @@ from base_crawler import BaseCrawler
 from base_crawler import ErrorTimeout
 from base_crawler import ErrorPassword
 
+
 class Crawler(BaseCrawler):
     """crawler for D-Link 5 serial routers"""
-    def __init__(self, addr, port, username, password, session):
-        BaseCrawler.__init__(self, addr, port, username, password, session)
+    def __init__(self, addr, port, username, password, session, debug):
+        BaseCrawler.__init__(self, addr, port, username, password, session, debug)
         self.res['dns'] = ['/Status/st_devic.htm', 'priDns = "(.+?)".+?"(.+?)";']
         self.res['firmware'] = ['/Status/st_devic.htm', 'firmareVersion = "(.+?)"', 1]
         self.res['hardware'] = ['/Status/st_devic.htm', 'ModuleName="(.+?)"', 1]

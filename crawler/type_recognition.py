@@ -5,6 +5,7 @@
 import re
 from base_crawler import ErrorTimeout
 
+
 class TypeRecognition(object):
     """Recognize the router type"""
     # attention! DD-WRT must be the first type to match, because if cotains other types' key string
@@ -100,4 +101,4 @@ class TypeRecognition(object):
                     brand_match = type_pattern.search(fingerprstr)
                     if brand_match:
                         return type_re[0], self.server, self.realm
-        return '', '', ''
+        return '', self.server, self.realm

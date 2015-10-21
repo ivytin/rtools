@@ -10,8 +10,8 @@ from base_crawler import ErrorPassword
 
 class Crawler(BaseCrawler):
     """crawler for Netgear WGR6 routers"""
-    def __init__(self, addr, port, username, password, session):
-        BaseCrawler.__init__(self, addr, port, username, password, session)
+    def __init__(self, addr, port, username, password, session, debug):
+        BaseCrawler.__init__(self, addr, port, username, password, session, debug)
         self.res['dns'] = ['/RST_status.htm', '([\d\.]+?)<br>([\d\.]+?)<br>']
         self.res['firmware'] = ['/RST_status.htm', 'V\d\.[\d\._]+', 1]
         self.res['hardware'] = ['/RST_status.htm', '<META name="description" content="(.+?)">', 1]

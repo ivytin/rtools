@@ -20,7 +20,7 @@ parser.add_option("-o", "--output-file", dest="out_file_path", default=default_o
                   help="scan output file path", metavar="FILE")
 # thread number
 parser.add_option("-t", "--threads", dest="threads_num", type="int", default=3,
-                  help="scan theads num", metavar="NUM")
+                  help="scan threads num", metavar="NUM")
 
 # crawling mode
 parser.add_option("-c", "--crawl",
@@ -46,7 +46,7 @@ parser.add_option("--ddebug",
 crawl_flag = options.crawl
 dns_flag = options.dns
 c_debug = options.c_debug
-d_debug = options.c_debug
+d_debug = options.d_debug
 
 if (crawl_flag or dns_flag or c_debug or d_debug) is False:
     print 'no mode chosen, program will exit'
@@ -73,7 +73,7 @@ if d_debug:
         except Exception, e:
             print 'arg should include ip, port ,username, password, type, dns1, dns2'
             sys.exit(-1)
-    target_dns = [args[4], args[5]]
+    target_dns = [args[5], args[6]]
     test_setter = DnssetFactory(addr=args[0], port=int(args[1]),
                                 username=args[2], password=args[3],
                                 type=args[4], dns=target_dns, debug=True)

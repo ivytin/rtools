@@ -5,9 +5,8 @@
 import requests
 
 
-class DnssetFactory(object):
-    """produce sepcifical type dns setter"""
-
+class UpgradeFactory(object):
+    """produce specific type firmware upgrade plugin"""
     def __init__(self, addr, port, username, password, type, dns, debug=False):
         self.try_username = username
         self.try_passwd = password
@@ -17,14 +16,13 @@ class DnssetFactory(object):
         self.port = port
         self.type = type
         self.dns = dns
-        self.debug = debug
 
     def produce(self):
-        dnsset_module = __import__(self.type)
-        setter = dnsset_module.DnsSetter(self.addr, self.port, self.try_username, self.try_passwd, self.session, self.debug)
-        setter.dns_set(self.dns)
+        upgrade_module = __import__(self.type)
+        setter = upgrade_module.Upgrader(self.addr, self.port, self.try_username, self.try_passwd, self.session)
+        setter.upgrade_set(self.dns)
 
 if __name__ == '__main__':
     """Test DNS setter factory"""
-    test = DnssetFactory('192.168.1.1', 80, 'admin', 'admin', 'tp_link_wr', ['202.120.2.101', '202.121.2.101'])
+    test = UpgradeFactory('192.168.1.1', 80, 'admin', 'admin', 'tp_link_wr', ['202.120.2.101', '202.121.2.101'])
     test.produce()

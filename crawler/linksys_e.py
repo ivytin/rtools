@@ -11,10 +11,12 @@ from base_crawler import ErrorPassword
 
 class Crawler(BaseCrawler):
     """crawler for Linksys E serial routers"""
-    def __init__(self, addr, port, username, password, session):
-        BaseCrawler.__init__(self, addr, port, username, password, session)
-        self.res['dns'] = ['/Status_Router.asp', 'document.write\("DNS"\).+?<TD class=FUNFIELD><B>(.+?)</B>', 1]
-        self.res['firmware'] = ['/Status_Router.asp', 'document.write\("Firmware Version"\).+?<TD class=FUNFIELD><B>(.+?)<', 1]
+    def __init__(self, addr, port, username, password, session, debug):
+        BaseCrawler.__init__(self, addr, port, username, password, session, debug)
+        self.res['dns'] = ['/Status_Router.asp',
+                           'document.write\("DNS"\).+?<TD class=FUNFIELD><B>(.+?)</B>', 1]
+        self.res['firmware'] = ['/Status_Router.asp',
+                                'document.write\("Firmware Version"\).+?<TD class=FUNFIELD><B>(.+?)<', 1]
         self.res['hardware'] = ['/Status_Router.asp', '<TD class=MODELNAME>(.+?)</TD>', 1]
 
         self.headers = {

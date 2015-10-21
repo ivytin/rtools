@@ -5,16 +5,37 @@ August 18, 2015 2:53 PM
 A router information crawler with multiple threading (thread pool) design. And support automatic DNS setting.
 
 #### Working with: 
-- TP-Link WR serial router
+- TP-Link
+	- WR serial 
+	- VPN 
 - DD-WRT
-- D-Link ADSL
-- D-Link DIR-505
+- D-Link 
+	- DIR-505
+	- DI serial
+	- ADSL
+	- DCS
+- Mecury
+	- WM
+- Cisco/Linksys
+	- E2000
+	- X2000
+	- WGT
+- Surecom
+- Netgear
+	- JWNR
+	- WGR
+	- WNR
+- Edimax
+- Tenda
 
 #### Lib:
 - requests
 
 #### To do:
-- [ ] Add support for more types
+- More types support
+	- [ ] Netgear DNS
+	- [ ] Netgear firmware upgrade plugins
+	- [ ] TP-Link firmware upgrade plugins
 
 - - -
 
@@ -63,6 +84,12 @@ ip, port, username, password, type
 ├── thread_pool.py
 ├── sqlite_crawler.py
 ```
+
+Although most of the plugins look very similar, but the plugin struct is necessary for the following reasons:
+- web manage page may change
+- authentications are different, including cookies, basic auth, etc
+- some routers' crawling methods are very *strange*
+
 When you need **add a crawler/dnsset plugin**, just extends the base class(base_crawler.py/base_setter.py). And rewrite the get_info/dns_set function.
 For crawler plugin, you need modify type_recognition.py module, add regular expression for new router type
 
