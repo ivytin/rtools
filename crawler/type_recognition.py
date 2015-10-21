@@ -8,14 +8,18 @@ from base_crawler import ErrorTimeout
 class TypeRecognition(object):
     """Recognize the router type"""
     # attention! DD-WRT must be the first type to match, because if cotains other types' key string
-    brand_res = [('DD-WRT', 'DD\W?WRT'), ('TP-LINK', 'TP\W?LINK'), ('TP-LINK', 'TL-'),
-                 ('D-LINK', 'D\W?LINK'), ('D-LINK', 'DSL'), ('D-LINK', 'DCS'), ('D-LINK', 'DI-\d'),
-                 ('ASUS', 'RT-N'), ('ASUS', 'RT-G'),
-                 ('Linksys', 'WRT'), ('Linksys', 'Linksys'),
-                 ('Mecury', 'Wireless N Router MW'),
-                 ('Tenda', '11N wireless broadband router'), ('Tenda', 'Tenda'), ('Tenda', 'NAT router'),
-                 ['Surecom', 'Broadband Router'], ('Edimax', 'Default: admin/1234'),
-                 ('Cisco', 'X2000'), ('Netgear', 'Netgear')]
+    brand_res = [
+         ('DD-WRT', 'DD\W?WRT'),
+         ('TP-LINK', 'TP\W?LINK'), ('TP-LINK', 'TL-'),
+         ('D-LINK', 'D\W?LINK'), ('D-LINK', 'DSL'), ('D-LINK', 'DCS'), ('D-LINK', 'DI-\d'),
+         ('ASUS', 'RT-N'), ('ASUS', 'RT-G'),
+         ('Linksys', 'WRT'), ('Linksys', 'Linksys'),
+         ('Mecury', 'Wireless N Router MW'),
+         ('Tenda', '11N wireless broadband router'), ('Tenda', 'Tenda'), ('Tenda', 'NAT router'),
+         ['Surecom', 'Broadband Router'], ('Edimax', 'Default: admin/1234'),
+         ('Cisco', 'X2000'),
+         ('Netgear', 'Netgear')
+    ]
 
     type_res = dict()
     type_res['DD-WRT'] = [

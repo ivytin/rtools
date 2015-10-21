@@ -7,9 +7,10 @@ import re
 from base_setter import BaseSetter
 from base_setter import ErrorTimeout
 
+
 class DnsSetter(BaseSetter):
     """DNS auto setter for TP-Link WR serial routers"""
-    def __init__(self, addr, port, username, passwd, session):
+    def __init__(self, addr, port, username, passwd, session, debug=False):
         BaseSetter.__init__(self, addr, port, username, passwd, session)
         auth_cookie = base64.b64encode(self.try_username + ':' + self.try_passwd)
         self.headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0',

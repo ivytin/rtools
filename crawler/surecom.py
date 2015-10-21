@@ -8,13 +8,13 @@ from base_crawler import BaseCrawler
 from base_crawler import ErrorTimeout
 from base_crawler import ErrorPassword
 
+
 class Crawler(BaseCrawler):
     """crawler for Surecom serial routers"""
     def __init__(self, addr, port, username, password, session):
         BaseCrawler.__init__(self, addr, port, username, password, session)
         self.res['dns'] = ['/Comm/Status.js', 'var va_DNSServer.+?(".+?".+?".+?")', 1]
 
-        auth_cookie = base64.b64encode(self.try_username + ':' + self.try_passwd)
         self.headers = {
             b'User-Agent': b'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0',
             b'Accept-Language': b'en-US',
@@ -24,8 +24,6 @@ class Crawler(BaseCrawler):
 
     def get_info(self):
         dns_info = ''
-        firmware = ''
-        hardware = ''
         r = self.connect_auth_with_headers(self.url, 1)
 
         if r.status_code == 403:
@@ -43,7 +41,7 @@ class Crawler(BaseCrawler):
             if dns_match:
                 dns_info = dns_match.group(self.res['dns'][2])
 
-        return dns_info, '', ''
+        return dns_info, '', 'Surecom'
 
 if __name__ == '__main__':
     """Test this unit"""

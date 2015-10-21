@@ -6,6 +6,7 @@ import re
 from base_crawler import BaseCrawler
 from base_crawler import ErrorTimeout
 
+
 class Crawler(BaseCrawler):
     """crawler for DD-WRT routers"""
     def __init__(self, addr, port, username, password, session):
@@ -20,15 +21,6 @@ class Crawler(BaseCrawler):
         hardware = ''
 
         dns_url = 'http://' + self.addr + ':' + str(self.port) + self.res['dns'][0]
-        # try:
-        #     r = self.connect(dns_url, 3)
-        # except ErrorTimeout, e:
-        #     pass
-        # else:
-        #     dns_pattern = re.compile(self.res['dns'][1], re.I | re.S)
-        #     dns_match = dns_pattern.search(r.content)
-        #     if dns_match:
-        #         dns_info = dns_match.group(self.res['dns'][2])
         
         firmware_url = 'http://' + self.addr + ':' + str(self.port) + self.res['firmware'][0]
         if firmware_url == dns_url:
@@ -47,18 +39,6 @@ class Crawler(BaseCrawler):
                 if firmware_match:
                     firmware = firmware_match.group(self.res['firmware'][2])
 
-        hardware_url = 'http://' + self.addr + ':' + str(self.port) + self.res['hardware'][0]
-        if hardware_url == firmware_url:
-            hardware_pattern = re.compile(self.res['hardware'][1], re.I | re.S)
-            hardware_match = hardware_pattern.search(r.content)
-            if hardware_match:
-                hardware = hardware_match.group(self.res['hardware'][2])
-        else:
-            try:
-                r = self.connect(hardware_url, 1)
-            except ErrorTimeout, e:
-                pass
-            else:
                 hardware_pattern = re.compile(self.res['hardware'][1], re.I | re.S)
                 hardware_match = hardware_pattern.search(r.content)
                 if hardware_match:

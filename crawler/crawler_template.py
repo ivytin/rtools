@@ -10,14 +10,16 @@ from base_crawler import ErrorPassword
 
 
 class Crawler(BaseCrawler):
-    """crawler for Linksys E serial routers"""
+    """crawler for TP-Link WR serial routers"""
     def __init__(self, addr, port, username, password, session):
         BaseCrawler.__init__(self, addr, port, username, password, session)
-        self.res['dns'] = ['/Status_Router.asp', 'document.write\("DNS"\).+?<TD class=FUNFIELD><B>(.+?)</B>', 1]
-        self.res['firmware'] = ['/Status_Router.asp', 'document.write\("Firmware Version"\).+?<TD class=FUNFIELD><B>(.+?)<', 1]
-        self.res['hardware'] = ['/Status_Router.asp', '<TD class=MODELNAME>(.+?)</TD>', 1]
+        self.res['dns'] = ['/userRpm/StatusRpm.htm', 'var wanPara = new Array(.+?)"([\d\.]+? , [\d\.]+?)"', 2]
+        self.res['firmware'] = ['/userRpm/StatusRpm.htm', 'var statusPara = new Array.+?"(.+?)"', 1]
+        self.res['hardware'] = ['/userRpm/StatusRpm.htm', 'var statusPara = new Array.+?".+?".+?"(.+?)"', 1]
 
+        auth_cookie = base64.b64encode(self.try_username + ':' + self.try_passwd)
         self.headers = {
+            b'Cookie': 'tLargeScreenP=1; subType=pcSub; Authorization=Basic ' + auth_cookie,
             b'User-Agent': b'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0',
             b'Accept-Language': b'en-US',
             b'Referer': '',
@@ -45,15 +47,39 @@ class Crawler(BaseCrawler):
             if dns_match:
                 dns_info = dns_match.group(self.res['dns'][2])
 
+        firmware_url = 'http://' + self.addr + ':' + str(self.port) + self.res['firmware'][0]
+        if firmware_url == dns_url:
             firmware_pattern = re.compile(self.res['firmware'][1], re.I | re.S)
             firmware_match = firmware_pattern.search(r.content)
             if firmware_match:
                 firmware = firmware_match.group(self.res['firmware'][2])
+        else:
+            try:
+                r = self.connect_auth_with_headers(firmware_url, 1)
+            except ErrorTimeout, e:
+                pass
+            else:
+                firmware_pattern = re.compile(self.res['firmware'][1], re.I | re.S)
+                firmware_match = firmware_pattern.search(r.content)
+                if firmware_match:
+                    firmware = firmware_match.group(self.res['firmware'][2])
 
+        hardware_url = 'http://' + self.addr + ':' + str(self.port) + self.res['hardware'][0]
+        if hardware_url == firmware_url:
             hardware_pattern = re.compile(self.res['hardware'][1], re.I | re.S)
             hardware_match = hardware_pattern.search(r.content)
             if hardware_match:
                 hardware = hardware_match.group(self.res['hardware'][2])
+        else:
+            try:
+                r = self.connect_auth_with_headers(hardware_url, 1)
+            except ErrorTimeout, e:
+                pass
+            else:
+                hardware_pattern = re.compile(self.res['hardware'][1], re.I | re.S)
+                hardware_match = hardware_pattern.search(r.content)
+                if hardware_match:
+                    hardware = hardware_match.group(self.res['hardware'][2])
 
         return dns_info, firmware, hardware
 

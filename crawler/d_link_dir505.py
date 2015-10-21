@@ -8,6 +8,7 @@ from base_crawler import BaseCrawler
 from base_crawler import ErrorTimeout
 from base_crawler import ErrorPassword
 
+
 class Crawler(BaseCrawler):
     """crawler for D-Link DIR-505 router"""
     def __init__(self, addr, port, username, password, session, debug=False):

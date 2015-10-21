@@ -4,6 +4,7 @@
 
 import threading
 
+
 class ErrorTimeout(Exception):
     """self define exception: requests page time out"""
     def __init__(self):
@@ -11,6 +12,7 @@ class ErrorTimeout(Exception):
 
     def __str__(self):
         return repr(self.value)
+
 
 class ErrorPassword(Exception):
     """self define exception: wrong password"""
@@ -20,11 +22,12 @@ class ErrorPassword(Exception):
     def __str__(self):
         return repr(self.value)
 
+
 class BaseSetter(object):
     """Automatic change routers' dns settings"""
     printLock = threading.Lock()
 
-    def __init__(self, addr, port, username, passwd, session):
+    def __init__(self, addr, port, username, passwd, session, debug=False):
         self.addr = addr
         self.port = port
         self.try_username = username

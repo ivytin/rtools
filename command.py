@@ -4,6 +4,7 @@
 
 from optparse import OptionParser
 from crawler.crawler_factory import CrawlerFactory
+from dnsset.dnsset_factory import DnssetFactory
 from thread_pool import WorkManager
 import time
 import sys
@@ -31,22 +32,27 @@ parser.add_option("-d", "--dns",
                   action="store_true", dest="dns", default=False,  
                   help="enable the dns set mode")
 
-# debug mode
-parser.add_option("--debug",
-                  action="store_true", dest="debug", default=False,  
-                  help="enable the debug mode")
+# crawler debug mode
+parser.add_option("--cdebug",
+                  action="store_true", dest="c_debug", default=False,
+                  help="enable the crawler debug mode")
+# dns set debug mode
+parser.add_option("--ddebug",
+                  action="store_true", dest="d_debug", default=False,
+                  help="enable the dns set debug mode")
 
 (options, args) = parser.parse_args()
 
 crawl_flag = options.crawl
 dns_flag = options.dns
-debug_flag = options.debug
+c_debug = options.c_debug
+d_debug = options.c_debug
 
-if (crawl_flag or dns_flag or debug_flag) is False:
+if (crawl_flag or dns_flag or c_debug or d_debug) is False:
     print 'no mode chosen, program will exit'
     sys.exit(-1)
 
-if debug_flag:
+if c_debug:
     sys.path.append('./crawler')
     for arg in xrange(4):
         try:
@@ -54,8 +60,24 @@ if debug_flag:
         except Exception, e:
             print 'args should include ip, port, username, password'
             sys.exit(-1)
-    test_crawl = CrawlerFactory(addr=args[0], port=int(args[1]), username=args[2], password=args[3], debug=True)
+    test_crawl = CrawlerFactory(addr=args[0], port=int(args[1]),
+                                username=args[2], password=args[3], debug=True)
     ret = test_crawl.produce()
+    sys.exit(0)
+
+if d_debug:
+    sys.path.append('./dnsset')
+    for arg in xrange(7):
+        try:
+            print args[arg]
+        except Exception, e:
+            print 'arg should include ip, port ,username, password, type, dns1, dns2'
+            sys.exit(-1)
+    target_dns = [args[4], args[5]]
+    test_setter = DnssetFactory(addr=args[0], port=int(args[1]),
+                                username=args[2], password=args[3],
+                                type=args[4], dns=target_dns, debug=True)
+    ret = test_setter.produce()
     sys.exit(0)
 
 data_in_path = options.in_file_path

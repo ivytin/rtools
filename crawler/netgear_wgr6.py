@@ -9,7 +9,7 @@ from base_crawler import ErrorTimeout
 from base_crawler import ErrorPassword
 
 class Crawler(BaseCrawler):
-    """crawler for Netgear wgr6 routers"""
+    """crawler for Netgear WGR6 routers"""
     def __init__(self, addr, port, username, password, session):
         BaseCrawler.__init__(self, addr, port, username, password, session)
         self.res['dns'] = ['/RST_status.htm', '([\d\.]+?)<br>([\d\.]+?)<br>']
@@ -44,39 +44,15 @@ class Crawler(BaseCrawler):
             if dns_match:
                 dns_info += dns_match.group(1) + ' ' + dns_match.group(2)
 
-        firmware_url = 'http://' + self.addr + ':' + str(self.port) + self.res['firmware'][0]
-        if firmware_url == dns_url:
             firmware_pattern = re.compile(self.res['firmware'][1], re.I | re.S)
             firmware_match = firmware_pattern.search(r.content)
             if firmware_match:
                 firmware = firmware_match.group(0)
-        else:
-            try:
-                r = self.connect_auth_with_headers(firmware_url, 1)
-            except ErrorTimeout, e:
-                pass
-            else:
-                firmware_pattern = re.compile(self.res['firmware'][1], re.I | re.S)
-                firmware_match = firmware_pattern.search(r.content)
-                if firmware_match:
-                    firmware = firmware_match.group(0)
 
-        hardware_url = 'http://' + self.addr + ':' + str(self.port) + self.res['hardware'][0]
-        if hardware_url == firmware_url:
             hardware_pattern = re.compile(self.res['hardware'][1], re.I | re.S)
             hardware_match = hardware_pattern.search(r.content)
             if hardware_match:
                 hardware = hardware_match.group(self.res['hardware'][2])
-        else:
-            try:
-                r = self.connect_auth_with_headers(hardware_url, 1)
-            except ErrorTimeout, e:
-                pass
-            else:
-                hardware_pattern = re.compile(self.res['hardware'][1], re.I | re.S)
-                hardware_match = hardware_pattern.search(r.content)
-                if hardware_match:
-                    hardware = hardware_match.group(self.res['hardware'][2])
 
         return dns_info, firmware, hardware
 

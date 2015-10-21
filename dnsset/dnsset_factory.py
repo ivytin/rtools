@@ -4,10 +4,11 @@
 
 import requests
 
+
 class DnssetFactory(object):
     """produce sepcifical type dns setter"""
 
-    def __init__(self, addr, port, username, password, type, dns):
+    def __init__(self, addr, port, username, password, type, dns, debug=False):
         self.try_username = username
         self.try_passwd = password
         self.session = requests.session()
