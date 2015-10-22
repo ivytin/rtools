@@ -24,7 +24,7 @@ class ErrorPassword(Exception):
 
 
 class BaseUpgrade(object):
-    """Automatic router's firmware"""
+    """Automatic update router's firmware"""
     printLock = threading.Lock()
 
     def __init__(self, addr, port, username, passwd, session, debug=False):

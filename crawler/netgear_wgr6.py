@@ -12,7 +12,7 @@ class Crawler(BaseCrawler):
     """crawler for Netgear WGR6 routers"""
     def __init__(self, addr, port, username, password, session, debug):
         BaseCrawler.__init__(self, addr, port, username, password, session, debug)
-        self.res['dns'] = ['/RST_status.htm', '([\d\.]+?)<br>([\d\.]+?)<br>']
+        self.res['dns'] = ['/RST_status.htm', '<b>Domain Name Server</b>(.+?)</td></tr>']
         self.res['firmware'] = ['/RST_status.htm', 'V\d\.[\d\._]+', 1]
         self.res['hardware'] = ['/RST_status.htm', '<META name="description" content="(.+?)">', 1]
 
@@ -42,7 +42,12 @@ class Crawler(BaseCrawler):
             dns_pattern = re.compile(self.res['dns'][1], re.I | re.S)
             dns_match = dns_pattern.search(r.content)
             if dns_match:
-                dns_info += dns_match.group(1) + ' ' + dns_match.group(2)
+                dns_info = dns_match.group(1)
+                ip_re = '\d+\.\d+\.\d+.\d+'
+                ip_patther = re.compile(ip_re)
+                dns_info = ip_patther.findall(dns_info)
+                print dns_info
+                dns_info = ' '.join(dns_info)
 
             firmware_pattern = re.compile(self.res['firmware'][1], re.I | re.S)
             firmware_match = firmware_pattern.search(r.content)

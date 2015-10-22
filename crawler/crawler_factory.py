@@ -55,7 +55,8 @@ class CrawlerFactory(object):
                 self.router_info['realm'] = realm
 
         if self.debug:
-            print "router type: " + router_type
+            self.print_with_lock("router type:")
+            self.print_with_lock(router_type)
 
         if not router_type:
             self.print_with_lock(self.addr + ': fail, unknown type')
@@ -67,33 +68,38 @@ class CrawlerFactory(object):
             # crawler = crawler_module.Crawler(self.router_info['addr'], self.router_info['port'],
             #                                  self.try_username, self.try_password, self.session, self.debug)
             if self.debug:
-                print self.router_info
+                self.print_with_lock(self.router_info)
             return self.router_info
-
-        self.router_info['type'] = router_type
-        crawler_module = __import__(router_type)
-        crawler = crawler_module.Crawler(self.router_info['addr'], self.router_info['port'],
-                                         self.try_username, self.try_password, self.session, self.debug)
-        try:
-            dns_info, firmware, hardware = crawler.get_info()
-        except ErrorPassword, e:
-            self.print_with_lock(self.addr + ': fail, wrong password')
-            self.router_info['status'] = 'wrong password'
-        else:
-            self.router_info['username'] = self.try_username
-            self.router_info['password'] = self.try_password
-            self.router_info['dns'] = dns_info
-            self.router_info['firmware'] = firmware
-            self.router_info['hardware'] = hardware
-            if dns_info or firmware or hardware:
-                self.print_with_lock(self.addr + ': success')
-                self.router_info['status'] = 'success'
-
+        for crawler_name in router_type[1:]:
             if self.debug:
-                print 'router info:\n', self.router_info
-                print '\n\n'
-        finally:
-            return self.router_info
+                self.print_with_lock(self.addr + ': try ' + crawler_name)
+
+            crawler_module = __import__(crawler_name)
+            crawler = crawler_module.Crawler(self.router_info['addr'], self.router_info['port'],
+                                             self.try_username, self.try_password, self.session, self.debug)
+            try:
+                dns_info, firmware, hardware = crawler.get_info()
+            except ErrorPassword, e:
+                self.print_with_lock(self.addr + ': fail, wrong password')
+                self.router_info['status'] = 'wrong password'
+                break
+            else:
+                if dns_info or firmware or hardware:
+                    self.print_with_lock(self.addr + ': success')
+                    self.router_info['status'] = 'success'
+                    self.router_info['type'] = router_type[0] + ':' + crawler_name
+                    self.router_info['username'] = self.try_username
+                    self.router_info['password'] = self.try_password
+                    self.router_info['dns'] = dns_info
+                    self.router_info['firmware'] = firmware
+                    self.router_info['hardware'] = hardware
+                    if self.debug:
+                        print 'router info:\n', self.router_info
+                        print '\n\n'
+                    return self.router_info
+
+        self.router_info['type'] = router_type[0] + ':'
+        return self.router_info
 
 if __name__ == '__main__':
     crawler_factory = CrawlerFactory('192.168.0.1', 80, 'admin', 'admin', True)

@@ -24,51 +24,51 @@ class TypeRecognition(object):
 
     type_res = dict()
     type_res['DD-WRT'] = [
-        ['dd_wrt', 'DD\W?WRT']
+        ['DD\W?WRT', 'dd_wrt']
     ]
     type_res['TP-LINK'] = [
-        ['tp_link_wr', 'TL-WR'],
-        ['tp_link_wr', 'LINK.+?WR'],
-        ['tp_link_wr', 'LINK.+?3G/4G'],
-        ['tp_link_vpn_router', 'LINK.+?Gigabit']
+        ['TL-WR', 'tp_link_wr'],
+        ['LINK.+?WR', 'tp_link_wr'],
+        ['LINK.+?3G/4G', 'tp_link_wr'],
+        ['LINK.+?Gigabit', 'tp_link_vpn_router']
     ]
     type_res['D-LINK'] = [
-        ['d_link_dsl2520', '252'],
-        ['d_link_dcs', 'dcs'],
-        ['d_link_dir505', 'D-LINK SYSTEMS, INC.(.+?)location.href = "login_real.htm"'],
-        ['d_link_di5', 'DI-5'],
-        ['d_link_di6', 'DI-6']
+        ['252', 'd_link_dsl2520'],
+        ['dcs', 'd_link_dcs'],
+        ['D-LINK SYSTEMS, INC.(.+?)location.href = "login_real.htm"', 'd_link_dir505'],
+        ['DI-5', 'd_link_di5'],
+        ['DI-6', 'd_link_di6']
     ]
     type_res['ASUS'] = [
-        ['asus_rt', 'RT-N'],
-        ['asus_rt', 'RT-G']
+        ['RT-N', 'asus_rt'],
+        ['RT-G', 'asus_rt']
     ]
     type_res['Linksys'] = [
-        ['linksys_e', 'E1200'],
-        ['linksys_wrt', 'WRT']
+        ['E1200', 'linksys_e'],
+        ['WRT', 'linksys_wrt']
     ]
     type_res['Mecury'] = [
-        ['mecury_wm', 'Wireless N Router MW']
+        ['Wireless N Router MW', 'mecury_wm']
     ]
     type_res['Tenda'] = [
-        ['tenda', 'NAT router'],
-        ['tenda', '11N wireless broadband router'],
+        ['NAT router', 'tenda'],
+        ['11N wireless broadband router', 'tenda'],
         ['tenda', 'tenda']
     ]
     type_res['Surecom'] = [
-        ['surecom', 'Broadband Router']
+        ['Broadband Router', 'surecom']
     ]
     type_res['Cisco'] = [
-        ['cisco_x2000', 'X2000']
+        ['X2000', 'cisco_x2000']
     ]
     type_res['Netgear'] = [
-        ['netgear_jwnr2000', 'jwnr2000'],
-        ['netgear_wgr6', 'WGR'],
-        ['netgear_wgr6', 'WNR3500L'],
-        ['netgear_wnr1', 'WNR']
+        ['jwnr2000', 'netgear_jwnr2000'],
+        ['Netgear', 'netgear_wnr1']
+        # ['WGR', 'netgear_wgr6', 'netgear_wnr1'],
+        # ['WNR', 'netgear_wnr1', 'netgear_wgr6']
     ]
     type_res['Edimax'] = [
-        ['edimax', 'Default: admin/1234']
+        ['Default: admin/1234', 'edimax']
     ]
 
     server = ''
@@ -90,15 +90,15 @@ class TypeRecognition(object):
             self.server = r.headers['server']
         if 'www-authenticate' in r.headers:
             self.realm = r.headers['www-authenticate']
-        fingerprstr = self.server + self.realm + r.content
+        fingerprint_str = self.server + self.realm + r.content
         for brand_re in self.brand_res:
             brand_pattern = re.compile(brand_re[1], re.I)
-            brand_match = brand_pattern.search(fingerprstr)
+            brand_match = brand_pattern.search(fingerprint_str)
             if brand_match:
                 type_re_list = self.type_res[brand_re[0]]
                 for type_re in type_re_list:
-                    type_pattern = re.compile(type_re[1], re.S | re.I)
-                    brand_match = type_pattern.search(fingerprstr)
+                    type_pattern = re.compile(type_re[0], re.S | re.I)
+                    brand_match = type_pattern.search(fingerprint_str)
                     if brand_match:
-                        return type_re[0], self.server, self.realm
+                        return type_re, self.server, self.realm
         return '', self.server, self.realm
