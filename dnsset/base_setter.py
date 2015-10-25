@@ -34,6 +34,7 @@ class BaseSetter(object):
         self.try_passwd = passwd
         self.session = session
         self.headers = dict()
+        self.debug = debug
 
     def print_with_lock(self, str):
         self.printLock.acquire()
