@@ -23,17 +23,19 @@ class ErrorPassword(Exception):
         return repr(self.value)
 
 
-class BaseUpgrade(object):
+class BaseUpgrader(object):
     """Automatic update router's firmware"""
     printLock = threading.Lock()
 
-    def __init__(self, addr, port, username, passwd, session, debug=False):
+    def __init__(self, addr, port, username, passwd, session, firmware, debug=False):
         self.addr = addr
         self.port = port
         self.try_username = username
         self.try_passwd = passwd
         self.session = session
+        self.firmware = firmware
         self.headers = dict()
+        self.debug = debug
 
     def print_with_lock(self, str):
         self.printLock.acquire()
@@ -68,5 +70,5 @@ class BaseUpgrade(object):
                 pass
         raise ErrorTimeout
 
-    def upgrade_set(self, dns):
+    def upgrade(self):
         pass

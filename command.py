@@ -8,6 +8,7 @@ from dnsset.dnsset_factory import DnssetFactory
 from thread_pool import WorkManager
 import time
 import sys
+from upgrade.upgrade_factory import UpgradeFactory
 
 default_out_file = time.strftime("%m.%d-%H.%M.%S", time.localtime()) + '.csv'
 
@@ -41,14 +42,20 @@ parser.add_option("--ddebug",
                   action="store_true", dest="d_debug", default=False,
                   help="enable the dns set debug mode")
 
+# firmware upgrade debubg mode
+parser.add_option('--udebug',
+                  action='store_true', dest='u_debug', default=False,
+                  help='enable the upgrade debug mode')
+
 (options, args) = parser.parse_args()
 
 crawl_flag = options.crawl
 dns_flag = options.dns
 c_debug = options.c_debug
 d_debug = options.d_debug
+u_debug = options.u_debug
 
-if (crawl_flag or dns_flag or c_debug or d_debug) is False:
+if (crawl_flag or dns_flag or c_debug or d_debug or u_debug) is False:
     print 'no mode chosen, program will exit'
     sys.exit(-1)
 
@@ -78,6 +85,20 @@ if d_debug:
                                 username=args[2], password=args[3],
                                 type=args[4], dns=target_dns, debug=True)
     ret = test_setter.produce()
+    sys.exit(0)
+
+if u_debug:
+    sys.path.append('./upgrade')
+    for arg in xrange(6):
+        try:
+            print args[arg]
+        except Exception:
+            print 'arg should include ip, addr, port, username, password, type, firmware'
+            sys.exit(-1)
+    test_upgrader = UpgradeFactory(addr=args[0], port=args[1],
+                                   username=args[2], password==args[3],
+                                   type=args[4], firmware=args[5], debug=True)
+    ret = test_upgrader.produce()
     sys.exit(0)
 
 data_in_path = options.in_file_path
