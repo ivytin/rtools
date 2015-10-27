@@ -69,5 +69,17 @@ class BaseSetter(object):
                 pass
         raise ErrorTimeout
 
+    def post_auth_with_headers(self, url, data, times):
+        for x in xrange(times):
+            try:
+                r = self.session.post(url, auth=(self.try_username, self.try_passwd),
+                                      timeout=2, allow_redirects=True, headers=self.headers, data=data)
+
+                return r
+            except Exception, e:
+                print e
+                pass
+        raise ErrorTimeout
+
     def dns_set(self, dns):
         pass
