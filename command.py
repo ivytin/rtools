@@ -96,7 +96,7 @@ if u_debug:
             print 'arg should include ip, addr, port, username, password, type, firmware'
             sys.exit(-1)
     test_upgrader = UpgradeFactory(addr=args[0], port=args[1],
-                                   username=args[2], password==args[3],
+                                   username=args[2], password=args[3],
                                    type=args[4], firmware=args[5], debug=True)
     ret = test_upgrader.produce()
     sys.exit(0)

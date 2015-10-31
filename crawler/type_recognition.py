@@ -13,7 +13,7 @@ class TypeRecognition(object):
          ('DD-WRT', 'DD\W?WRT'),
          ('TP-LINK', 'TP\W?LINK'), ('TP-LINK', 'TL-'),
          ('D-LINK', 'D\W?LINK'), ('D-LINK', 'DSL'), ('D-LINK', 'DCS'), ('D-LINK', 'DI-\d'),
-         ('ASUS', 'RT-N'), ('ASUS', 'RT-G'),
+         ('ASUS', 'RT-'),
          ('Linksys', 'WRT'), ('Linksys', 'Linksys'),
          ('Mecury', 'Wireless N Router MW'),
          ('Tenda', '11N wireless broadband router'), ('Tenda', 'Tenda'), ('Tenda', 'NAT router'),
@@ -30,7 +30,8 @@ class TypeRecognition(object):
         ['TL-WR', 'tp_link_wr'],
         ['LINK.+?WR', 'tp_link_wr'],
         ['LINK.+?3G/4G', 'tp_link_wr'],
-        ['LINK.+?Gigabit', 'tp_link_vpn_router']
+        ['LINK.+?Gigabit', 'tp_link_vpn_router'],
+        ['SOHO', 'tp_link_soho']
     ]
     type_res['D-LINK'] = [
         ['252', 'd_link_dsl2520'],
@@ -40,8 +41,7 @@ class TypeRecognition(object):
         ['DI-6', 'd_link_di6']
     ]
     type_res['ASUS'] = [
-        ['RT-N', 'asus_rt'],
-        ['RT-G', 'asus_rt']
+        ['RT', 'asus_rt', 'asus_rt_2']
     ]
     type_res['Linksys'] = [
         ['E1200', 'linksys_e'],
@@ -62,7 +62,7 @@ class TypeRecognition(object):
         ['X2000', 'cisco_x2000']
     ]
     type_res['Netgear'] = [
-        ['jwnr2000', 'netgear_jwnr2000'],
+        ['jwnr2000', 'netgear_jwnr2000', 'netgear_jwnr2000_2'],
         ['Netgear', 'netgear_wnr1']
         # ['WGR', 'netgear_wgr6', 'netgear_wnr1'],
         # ['WNR', 'netgear_wnr1', 'netgear_wgr6']

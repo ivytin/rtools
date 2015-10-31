@@ -99,6 +99,8 @@ class CrawlerFactory(object):
                     return self.router_info
 
         self.router_info['type'] = router_type[0] + ':'
+        if self.debug:
+            print 'find nothing'
         return self.router_info
 
 if __name__ == '__main__':
