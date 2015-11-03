@@ -33,38 +33,41 @@ A router information crawler with multiple threading (thread pool) design. And s
 
 #### To do:
 - More types support
-	- [ ] Netgear DNS
+	- [ ]ROM-0
+	- [x] Netgear DNS
 	- [ ] Netgear firmware upgrade plugins
-	- [ ] TP-Link firmware upgrade plugins
+	- [x] TP-Link firmware upgrade plugins
 
 - - -
 
 #### usage：
 ```bash
 $python command.py -h --help		view help
-$python command.py --debug <ip_address> <port> <username> <password>		test router info crawling func
+$python command.py --cdebug <ip_address> <port> <username> <password>		test router info crawling func
+$python command.py --ddebug <ip_address> <port> <username> <password><dns1><dns2><router_typep>		test router dns setting func
 $python command.py -c -i <target csv file> [-o <result out file>] -t <thread_num>		crawling targets info
-$python command.py -d -i <target csv file> -t <thread_num> <dns1> <dns2>		set targets dns
+$python command.py -d -i <target csv file> -t <thread_num> <dns>		set targets dns
 ```
 
 the input file for crawling should be csv format like following:
-```csv
+```js
 ip, port, username, password
 ```
 the output file format：
-```csv
+```js
 ip, port, status, server, www-authentication, username, password, dns, type
-14.199.15.34, 80, admin, admin, 202.120.2.101, dd_wrt
+14.199.15.34, 80, success,Router Webserver, Basic realm="TP-LINK Wireless N Gigabit Router WR1043ND" , admin, admin, 202.120.2.101, dd_wrt
 ```
 
 **Notice:** the last column *type* is the router model type detected by type_recognition.py, it will help the dns setting function to find the dns changing methods.
 
 
 the input file for dns setting format:
-```csv
+```js
 ip, port, username, password, type
 58.152.26.245, 80, admin, admin, dd_wrt
 ```
+
 - - -
 
 #### Sourcecode structure
@@ -91,5 +94,5 @@ Although most of the plugins look very similar, but the plugin struct is necessa
 - some routers' crawling methods are very *strange*
 
 When you need **add a crawler/dnsset plugin**, just extends the base class(base_crawler.py/base_setter.py). And rewrite the get_info/dns_set function.
-For crawler plugin, you need modify type_recognition.py module, add regular expression for new router type
+For each new crawler plugin, you need modify type_recognition.py module, add regular expression for new router type to register the plugin.
 
