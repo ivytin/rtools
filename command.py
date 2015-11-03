@@ -120,11 +120,10 @@ if crawl_flag:
 if dns_flag:
     sys.path.append('./dnsset')
     try:
-        dns1 = args[0]
-        dns2 = args[1]
+        dns = args[0]
     except Exception, e:
-        print 'need two dns address to continue'
+        print 'need dns address to continue'
         sys.exit(-1)
-    work_manager = WorkManager(data_in_path, data_out_path, threads_num, 'dns', dns1, dns2)
+    work_manager = WorkManager(data_in_path, data_out_path, threads_num, 'dns', dns)
     work_manager.wait_all()
     sys.exit(0)

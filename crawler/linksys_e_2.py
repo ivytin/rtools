@@ -10,13 +10,14 @@ from base_crawler import ErrorPassword
 
 
 class Crawler(BaseCrawler):
-    """crawler for ASUS RT serial routers"""
+    """crawler for Linksys E serial routers"""
     def __init__(self, addr, port, username, password, session, debug):
         BaseCrawler.__init__(self, addr, port, username, password, session, debug)
-        self.info_url = '/tcpipwan.asp'
-        self.res['dns'] = 'name="dns1" class="input" size="18" maxlength="15" value=(.+?)>'
-        self.res['firmware'] = 'name="firmver" value="(.+?)">'
-        self.res['hardware'] = 'RT-\S+'
+        self.info_url = '/Status_Router.asp'
+        self.res['dns1'] = 'dns\[0\] = (\S+)'
+        self.res['dns2'] = 'dns\[1\] = (\S+)'
+        self.res['firmware'] = 'firmware version = (\S+)'
+        self.res['hardware'] = 'model name = (\S+)'
 
         self.headers = {
             b'User-Agent': b'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0',
@@ -29,22 +30,24 @@ class Crawler(BaseCrawler):
         dns_info = ''
         firmware = ''
         hardware = ''
-        r = self.connect_auth_with_headers(self.url, 2)
+        r = self.connect_auth_with_headers(self.url, 1)
 
         if r.status_code == 403:
             raise ErrorPassword
 
-        url = self.url + self.info_url
+        info_url = self.url + self.info_url
         self.headers['Referer'] = self.url
         try:
-            r = self.connect_auth_with_headers(url, 2)
+            r = self.connect_auth_with_headers(info_url, 1)
         except ErrorTimeout, e:
             pass
         else:
-            dns_pattern = re.compile(self.res['dns'], re.I | re.S)
-            dns_match = dns_pattern.search(r.content)
-            if dns_match:
-                dns_info = dns_match.group(1)
+            dns_pattern1 = re.compile(self.res['dns1'], re.I | re.S)
+            dns_pattern2 = re.compile(self.res['dns2'], re.I | re.S)
+            dns_match1 = dns_pattern1.search(r.content)
+            dns_match2 = dns_pattern2.search(r.content)
+            if dns_match1 and dns_match2:
+                dns_info = dns_match1.group(1) + ', ' + dns_match2.group(1)
 
             firmware_pattern = re.compile(self.res['firmware'], re.I | re.S)
             firmware_match = firmware_pattern.search(r.content)

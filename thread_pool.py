@@ -45,7 +45,7 @@ class WorkManager(object):
         else:
             print '-----dns mode-----'
             for x in xrange(target_num):
-                self.add_works(self.dns, [target_list[x], dns[0], dns[1]])
+                self.add_works(self.dns, [target_list[x], dns[0]])
 
     def __init_thread_pool(self, thread_num):
         for x in xrange(thread_num):
@@ -58,14 +58,14 @@ class WorkManager(object):
         self.data_out(self.data_out_path, router_info)
 
     def dns(self, target):
-        # target sample: [['ip', port, 'username', 'passwd', 'type], '8.8.4.4', '8.8.8.8']
-        dns1 = target[1]
-        dns2 = target[2]
-        dns = [dns1, dns2]
-        if (not self.valid_ip(dns1)) or (not self.valid_ip(dns2)):
+        # target sample: [['ip', port, 'username', 'passwd', 'original dns', 'type], '8.8.4.4']
+        dns = target[1]
+        if not self.valid_ip(dns):
             print 'illegal dns address'
             sys.exit(-1)
-        dns_thread = DnssetFactory(target[0][0], target[0][1], target[0][2], target[0][3], target[0][4], dns)
+        dns_thread = DnssetFactory(target[0][0], target[0][1], target[0][2],
+                                   target[0][3], target[0][4],
+                                   target[0][5], dns)
         dns_thread.produce()
 
     def data_out(self, file_path, router_info):
@@ -118,6 +118,7 @@ class WorkManager(object):
             while x.isAlive():
                 print self.check_queue(), 'tasks remaining.'
                 time.sleep(5)
+
 
 class Work(threading.Thread):
     """worker thread class"""

@@ -100,5 +100,6 @@ class TypeRecognition(object):
                     type_pattern = re.compile(type_re[0], re.S | re.I)
                     brand_match = type_pattern.search(fingerprint_str)
                     if brand_match:
-                        return type_re, self.server, self.realm
-        return '', self.server, self.realm
+                        return type_re, self.server, self.realm, brand_re[0]
+                return '', self.server, self.realm, brand_re[0]
+        return '', self.server, self.realm, ''

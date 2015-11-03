@@ -42,8 +42,9 @@ class CrawlerFactory(object):
     def produce(self):
         recognition = TypeRecognition()
         try:
-            router_type, server, realm = recognition.type_recognition(self.router_info['addr'],
-                                                               self.router_info['port'], self.session)
+            router_type, server, realm, brand = recognition.type_recognition(self.router_info['addr'],
+                                                                             self.router_info['port'],
+                                                                             self.session)
         except ErrorTimeout, e:
             self.print_with_lock(self.addr + ': fail, connect timeout at type recognition')
             self.router_info['status'] = 'offline'
@@ -82,12 +83,16 @@ class CrawlerFactory(object):
             except ErrorPassword, e:
                 self.print_with_lock(self.addr + ': fail, wrong password')
                 self.router_info['status'] = 'wrong password'
-                break
+                return self.router_info
+            except ErrorTimeout, e:
+                self.print_with_lock(self.addr + ': fail, connect timeout at get info')
+                self.router_info['status'] = 'incomplete'
+                return self.router_info
             else:
                 if dns_info or firmware or hardware:
                     self.print_with_lock(self.addr + ': success')
                     self.router_info['status'] = 'success'
-                    self.router_info['type'] = router_type[0] + ':' + crawler_name
+                    self.router_info['type'] = brand + ':' + crawler_name
                     self.router_info['username'] = self.try_username
                     self.router_info['password'] = self.try_password
                     self.router_info['dns'] = dns_info

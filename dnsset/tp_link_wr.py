@@ -94,7 +94,7 @@ class DnsSetter(BaseSetter):
         try:
             r = self.connect_auth_with_headers(dns_url, 2)
         except ErrorTimeout:
-            self.print_with_lock(self.addr + ': fail, no response')
+            self.print_with_lock(self.addr + ': maybe fail, no response')
         else:
             if r.content.find(dns[0]) > 0:
                 self.print_with_lock(self.addr + ': success')
