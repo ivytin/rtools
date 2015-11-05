@@ -33,7 +33,7 @@ A router information crawler with multiple threading (thread pool) design. And s
 
 #### To do:
 - More types support
-	- [ ]ROM-0
+	- [ ] ROM-0
 	- [x] Netgear DNS
 	- [ ] Netgear firmware upgrade plugins
 	- [x] TP-Link firmware upgrade plugins
