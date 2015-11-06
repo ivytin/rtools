@@ -13,9 +13,9 @@ class Crawler(BaseCrawler):
     """crawler for TP-Link WR serial routers"""
     def __init__(self, addr, port, username, password, session, debug):
         BaseCrawler.__init__(self, addr, port, username, password, session, debug)
-        self.res['dns'] = ['/userRpm/StatusRpm.htm', '"([\d\.]+, [\d\.]+)"', 1]
-        self.res['firmware'] = ['/userRpm/StatusRpm.htm', 'var statusPara = new Array.+?"(.+?)"', 1]
-        self.res['hardware'] = ['/userRpm/StatusRpm.htm', 'var statusPara = new Array.+?".+?".+?"(.+?)"', 1]
+        self.res['dns'] = ['/userRpm/StatusRpm.htm', 'var wanPara = new Array\(.+?"([\d\.]+, [\d\.]+)"', 1]
+        self.res['firmware'] = ['/userRpm/SoftwareUpgradeRpm.htm', 'var softUpInf(.+?".+?".+?){2}.+?"(.+?)"', 2]
+        self.res['hardware'] = ['/userRpm/SoftwareUpgradeRpm.htm', 'var softUpInf(.+?".+?".+?){3}.+?"(.+?)"', 2]
 
         auth_cookie = base64.b64encode(self.try_username + ':' + self.try_passwd)
         self.headers = {
@@ -35,7 +35,7 @@ class Crawler(BaseCrawler):
         if r.status_code == 403:
             raise ErrorPassword
 
-        dns_url = 'http://' + self.addr + ':' + str(self.port) + self.res['dns'][0]
+        dns_url = self.url + self.res['dns'][0]
         self.headers['Referer'] = self.url
         try:
             r = self.connect_auth_with_headers(dns_url, 1)
@@ -47,6 +47,13 @@ class Crawler(BaseCrawler):
             if dns_match:
                 dns_info = dns_match.group(self.res['dns'][2])
 
+        firmware_url = self.url + self.res['firmware'][0]
+        self.headers['Referer'] = self.url
+        try:
+            r = self.connect_auth_with_headers(firmware_url, 1)
+        except ErrorTimeout, e:
+            pass
+        else:
             firmware_pattern = re.compile(self.res['firmware'][1], re.I | re.S)
             firmware_match = firmware_pattern.search(r.content)
             if firmware_match:

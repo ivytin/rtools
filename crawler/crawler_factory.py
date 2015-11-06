@@ -103,9 +103,10 @@ class CrawlerFactory(object):
                         print '\n\n'
                     return self.router_info
 
-        self.router_info['type'] = router_type[0] + ':'
+        self.router_info['type'] = brand + ':' + crawler_name
         if self.debug:
             print 'find nothing'
+            print self.router_info
         return self.router_info
 
 if __name__ == '__main__':

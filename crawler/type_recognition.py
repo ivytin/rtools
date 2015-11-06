@@ -35,7 +35,7 @@ class TypeRecognition(object):
     ]
     type_res['D-LINK'] = [
         ['252', 'd_link_dsl2520'],
-        ['dcs', 'd_link_dcs'],
+        ['dcs', 'd_link_dcs', 'd_link_dcs_2'],
         ['D-LINK SYSTEMS, INC.(.+?)location.href = "login_real.htm"', 'd_link_dir505'],
         ['DI-5', 'd_link_di5'],
         ['DI-6', 'd_link_di6']
