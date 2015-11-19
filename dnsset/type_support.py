@@ -3,7 +3,7 @@
 # @Author: 'arvin'
 
 
-class TypeSupport(object):
+class DNSTypeSupport(object):
     """"""
 
     support_types = dict()

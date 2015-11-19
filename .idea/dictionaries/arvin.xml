@@ -2,6 +2,7 @@
   <dictionary name="arvin">
     <words>
       <w>addr</w>
+      <w>referer</w>
     </words>
   </dictionary>
 </component>

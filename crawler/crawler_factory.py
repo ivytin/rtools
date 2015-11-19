@@ -25,8 +25,8 @@ class CrawlerFactory(object):
         self.router_info['status'] = ''
         self.router_info['server'] = ''
         self.router_info['realm'] = ''
-        self.router_info['username'] = ''
-        self.router_info['password'] = ''
+        self.router_info['username'] = username
+        self.router_info['password'] = password
         self.router_info['firmware'] = ''
         self.router_info['hardware'] = ''
         self.router_info['dns'] = ''
@@ -62,8 +62,6 @@ class CrawlerFactory(object):
         if not router_type:
             self.print_with_lock(self.addr + ': fail, unknown type')
             self.router_info['status'] = 'unknown type'
-            self.router_info['username'] = self.try_username
-            self.router_info['password'] = self.try_password
             self.router_info['type'] = 'unknown'
             # crawler_module = __import__('unknown_type')
             # crawler = crawler_module.Crawler(self.router_info['addr'], self.router_info['port'],
@@ -93,8 +91,6 @@ class CrawlerFactory(object):
                     self.print_with_lock(self.addr + ': success')
                     self.router_info['status'] = 'success'
                     self.router_info['type'] = brand + ':' + crawler_name
-                    self.router_info['username'] = self.try_username
-                    self.router_info['password'] = self.try_password
                     self.router_info['dns'] = dns_info
                     self.router_info['firmware'] = firmware
                     self.router_info['hardware'] = hardware

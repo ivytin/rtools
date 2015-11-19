@@ -4,6 +4,7 @@
 
 from optparse import OptionParser
 from crawler.crawler_factory import CrawlerFactory
+from cvs_helper import CsvHelper
 from dnsset.dnsset_factory import DnssetFactory
 from thread_pool import WorkManager
 import time
@@ -47,6 +48,11 @@ parser.add_option('--udebug',
                   action='store_true', dest='u_debug', default=False,
                   help='enable the upgrade debug mode')
 
+# combine two cvs output files
+parser.add_option('--combine',
+                  action='store_true', dest='combine', default=False,
+                  help='combine two cvs output files')
+
 (options, args) = parser.parse_args()
 
 crawl_flag = options.crawl
@@ -54,6 +60,13 @@ dns_flag = options.dns
 c_debug = options.c_debug
 d_debug = options.d_debug
 u_debug = options.u_debug
+
+combine_mode = options.combine
+
+if combine_mode:
+    csv_helper = CsvHelper()
+    csv_helper.combine_file(sys.argv[2], sys.argv[3])
+    sys.exit(0)
 
 if (crawl_flag or dns_flag or c_debug or d_debug or u_debug) is False:
     print 'no mode chosen, program will exit'

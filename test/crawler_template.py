@@ -4,9 +4,9 @@
 
 import base64
 import re
-from base_crawler import BaseCrawler
-from base_crawler import ErrorTimeout
-from base_crawler import ErrorPassword
+from crawler.base_crawler import BaseCrawler
+from crawler.base_crawler import ErrorTimeout
+from crawler.base_crawler import ErrorPassword
 
 
 class Crawler(BaseCrawler):
