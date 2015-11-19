@@ -10,7 +10,6 @@ from upgrade.type_support import UpgradeTypeSupport
 
 
 class CsvHelper(object):
-
     def __init__(self):
         pass
 
@@ -18,7 +17,7 @@ class CsvHelper(object):
     def combine_file(path_lft, path_rht):
         time_prefix = time.strftime("%m.%d-%H.%M.%S", time.localtime())
         default_out_file = time_prefix + '_combine_out.csv'
-        default_dns_file = time_prefix+ '_combine_dns.csv'
+        default_dns_file = time_prefix + '_combine_dns.csv'
         default_upgrade_file = time_prefix + '_combine_upgrade.csv'
         file_lft = open(path_lft, 'rb')
         file_rht = open(path_rht, 'rb')
@@ -48,25 +47,23 @@ class CsvHelper(object):
                 if dns_method:
                     dns_out.writerow([list_lft[i][0], list_lft[i][1], list_lft[i][6],
                                       list_lft[i][7], list_lft[i][10], dns_method])
-                upgrade_method = UpgradeTypeSupport.upgrade_set_method(list_lft[i][5],
-                                                                       list_lft[i][8],
-                                                                       list_lft[i][9])
+                upgrade_method, firmware_path = UpgradeTypeSupport.upgrade_set_method(list_lft[i][5], list_lft[i][8],
+                                                                                      list_lft[i][9])
                 if upgrade_method:
                     upgrade_out.writerow([list_lft[i][0], list_lft[i][1], list_lft[i][6],
-                                      list_lft[i][7], list_lft[i][10], upgrade_method])
+                                          list_lft[i][7], upgrade_method, firmware_path])
                 continue
             elif list_rht[i][2] == 'success':
                 writer_out.writerow(list_rht[i])
                 dns_method = DNSTypeSupport.dns_set_method(list_rht[i][5])
                 if dns_method:
                     dns_out.writerow([list_rht[i][0], list_rht[i][1], list_rht[i][6],
-                                     list_rht[i][7], list_rht[i][10], dns_method])
-                upgrade_method = UpgradeTypeSupport.upgrade_set_method(list_rht[i][5],
-                                                                       list_rht[i][8],
-                                                                       list_rht[i][9])
+                                      list_rht[i][7], list_rht[i][10], dns_method])
+                upgrade_method, firmware_path = UpgradeTypeSupport.upgrade_set_method(list_rht[i][5], list_rht[i][8],
+                                                                                      list_rht[i][9])
                 if upgrade_method:
                     upgrade_out.writerow([list_rht[i][0], list_rht[i][1], list_rht[i][6],
-                                      list_rht[i][7], list_rht[i][10], upgrade_method])
+                                          list_rht[i][7], upgrade_method, firmware_path])
                 continue
             if list_lft[i][2] == '':
                 writer_out.writerow(list_lft[i])
@@ -84,6 +81,7 @@ class CsvHelper(object):
                 writer_out.writerow(list_lft[i])
 
         print 'combine file finish'
+
 
 if __name__ == '__main__':
     csv_helper = CsvHelper()

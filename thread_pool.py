@@ -10,12 +10,13 @@ import socket
 import sys
 from crawler.crawler_factory import CrawlerFactory
 from dnsset.dnsset_factory import DnssetFactory
+from upgrade.upgrade_factory import UpgradeFactory
 
 
 class WorkManager(object):
     """thread pool manager class"""
 
-    FUNC_NAME = ['crawl', 'dns']
+    FUNC_NAME = ['crawl', 'dns', 'upgrade']
 
     @staticmethod 
     def valid_ip(address):
@@ -42,10 +43,14 @@ class WorkManager(object):
             print '-----crawl mode-----'
             for x in xrange(target_num):
                 self.add_works(self.crawler, target_list[x])
-        else:
+        elif func == 'dns':
             print '-----dns mode-----'
             for x in xrange(target_num):
                 self.add_works(self.dns, [target_list[x], dns[0]])
+        elif func == 'upgrade':
+            print '-----upgrade mode-----'
+            for x in xrange(target_num):
+                self.add_works(self.upgrade, target_list[x])
 
     def __init_thread_pool(self, thread_num):
         for x in xrange(thread_num):
@@ -67,6 +72,11 @@ class WorkManager(object):
                                    target[0][3], target[0][4],
                                    target[0][5], dns)
         dns_thread.produce()
+
+    def upgrade(self, target):
+        # target sample: ['ip', 'port', 'username', 'password', 'upgrade_method', 'firmware']
+        upgrade_thread = UpgradeFactory(target[0], target[1], target[2], target[3], target[4], target[5])
+        upgrade_thread.produce()
 
     def data_out(self, file_path, router_info):
         router_row = []

@@ -20,10 +20,7 @@ class UpgradeFactory(object):
 
     def produce(self):
         upgrade_module = __import__(self.type)
-        upgrader = upgrade_module.Upgrader(self.addr, self.port, self.try_username, self.try_passwd, self.session, self.debug)
+        upgrader = upgrade_module.Upgrader(self.addr, self.port, self.try_username,
+                                           self.try_passwd, self.session, self.debug)
         upgrader.upgrade()
 
-if __name__ == '__main__':
-    """Test DNS setter factory"""
-    test = UpgradeFactory('192.168.1.1', 80, 'admin', 'admin', 'tp_link_wr', ['202.120.2.101', '202.121.2.101'])
-    test.produce()

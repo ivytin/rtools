@@ -34,6 +34,11 @@ parser.add_option("-d", "--dns",
                   action="store_true", dest="dns", default=False,  
                   help="enable the dns set mode")
 
+# upgrade firmware mpde
+parser.add_option("-u", "--upgrade",
+                  action="store_true", dest="upgrade", default=False,
+                  help="enable the upgrade firmware mode")
+
 # crawler debug mode
 parser.add_option("--cdebug",
                   action="store_true", dest="c_debug", default=False,
@@ -57,6 +62,7 @@ parser.add_option('--combine',
 
 crawl_flag = options.crawl
 dns_flag = options.dns
+upgrade_flag = options.upgrade
 c_debug = options.c_debug
 d_debug = options.d_debug
 u_debug = options.u_debug
@@ -68,7 +74,7 @@ if combine_mode:
     csv_helper.combine_file(sys.argv[2], sys.argv[3])
     sys.exit(0)
 
-if (crawl_flag or dns_flag or c_debug or d_debug or u_debug) is False:
+if (crawl_flag or dns_flag or c_debug or d_debug or u_debug or upgrade_flag) is False:
     print 'no mode chosen, program will exit'
     sys.exit(-1)
 
@@ -140,3 +146,7 @@ if dns_flag:
     work_manager = WorkManager(data_in_path, data_out_path, threads_num, 'dns', dns)
     work_manager.wait_all()
     sys.exit(0)
+
+if upgrade_flag:
+    sys.path.append('./upgrade')
+    work_manager = WorkManager(data_in_path, data_out_path, threads_num, 'upgrade')
