@@ -43,10 +43,12 @@ A router information crawler with multiple threading (thread pool) design. And s
 #### usage：
 ```bash
 $python command.py -h --help		view help
+$python command.py --combine <file_1> <file_2> combine two crawlling output csv files
 $python command.py --cdebug <ip_address> <port> <username> <password>		test router info crawling func
 $python command.py --ddebug <ip_address> <port> <username> <password><dns1><dns2><router_typep>		test router dns setting func
 $python command.py -c -i <target csv file> [-o <result out file>] -t <thread_num>		crawling targets info
 $python command.py -d -i <target csv file> -t <thread_num> <dns>		set targets dns
+$python command.py -u -i <target csv file> -t <thread_num>		upgrade target routers' firmware
 ```
 
 the input file for crawling should be csv format like following:
