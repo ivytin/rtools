@@ -2,15 +2,15 @@
 # -*- coding: utf-8 -*-
 # @Author: 'tan'
 
-import requests
 import threading
-from type_recognition import TypeRecognition
-from base_crawler import ErrorTimeout
-from base_crawler import ErrorPassword
+import requests
+from ..http_helper import ErrorTimeout
+from ..http_helper import ErrorPassword
+from plugin_loader import PluginLoader
 
 
 class CrawlerFactory(object):
-    """product specifical type crawler"""
+    """product specific module crawler"""
     printLock = threading.Lock()
 
     def __init__(self, addr, port, username, password, debug=False):
@@ -30,7 +30,7 @@ class CrawlerFactory(object):
         self.router_info['firmware'] = ''
         self.router_info['hardware'] = ''
         self.router_info['dns'] = ''
-        self.router_info['type'] = ''
+        self.router_info['module'] = ''
 
         self.debug = debug
 
@@ -40,13 +40,12 @@ class CrawlerFactory(object):
         self.printLock.release()
 
     def produce(self):
-        recognition = TypeRecognition()
+        plugin_loader = PluginLoader()
         try:
-            router_type, server, realm, brand = recognition.type_recognition(self.router_info['addr'],
-                                                                             self.router_info['port'],
-                                                                             self.session)
+            router_module, server, realm, vendor = plugin_loader.load_plugin(self.router_info['addr'],
+                                                                            self.router_info['port'], self.session)
         except ErrorTimeout, e:
-            self.print_with_lock(self.addr + ': fail, connect timeout at type recognition')
+            self.print_with_lock(self.addr + ': fail, connect timeout at module plugin_loader')
             self.router_info['status'] = 'offline'
             return self.router_info
         else:
@@ -56,20 +55,20 @@ class CrawlerFactory(object):
                 self.router_info['realm'] = realm
 
         if self.debug:
-            self.print_with_lock("router type:")
-            self.print_with_lock(router_type)
+            self.print_with_lock("router module:")
+            self.print_with_lock(router_module)
 
-        if not router_type:
-            self.print_with_lock(self.addr + ': fail, unknown type')
-            self.router_info['status'] = 'unknown type'
-            self.router_info['type'] = 'unknown'
-            # crawler_module = __import__('unknown_type')
+        if not router_module:
+            self.print_with_lock(self.addr + ': fail, unknown module')
+            self.router_info['status'] = 'unknown module'
+            self.router_info['module'] = 'unknown'
+            # crawler_module = __import__('unknown_module')
             # crawler = crawler_module.Crawler(self.router_info['addr'], self.router_info['port'],
             #                                  self.try_username, self.try_password, self.session, self.debug)
             if self.debug:
                 self.print_with_lock(self.router_info)
             return self.router_info
-        for crawler_name in router_type[1:]:
+        for crawler_name in router_module[1:]:
             if self.debug:
                 self.print_with_lock(self.addr + ': try ' + crawler_name)
 
@@ -78,11 +77,14 @@ class CrawlerFactory(object):
                                              self.try_username, self.try_password, self.session, self.debug)
             try:
                 dns_info, firmware, hardware = crawler.get_info()
-            except ErrorPassword, e:
+            # password error
+            except ErrorPassword:
                 self.print_with_lock(self.addr + ': fail, wrong password')
                 self.router_info['status'] = 'wrong password'
                 return self.router_info
-            except ErrorTimeout, e:
+
+            # connection timeout
+            except ErrorTimeout:
                 self.print_with_lock(self.addr + ': fail, connect timeout at get info')
                 self.router_info['status'] = 'incomplete'
                 return self.router_info
@@ -90,7 +92,7 @@ class CrawlerFactory(object):
                 if dns_info or firmware or hardware:
                     self.print_with_lock(self.addr + ': success')
                     self.router_info['status'] = 'success'
-                    self.router_info['type'] = brand + ':' + crawler_name
+                    self.router_info['module'] = vendor + ':' + crawler_name
                     self.router_info['dns'] = dns_info
                     self.router_info['firmware'] = firmware
                     self.router_info['hardware'] = hardware
@@ -99,11 +101,12 @@ class CrawlerFactory(object):
                         print '\n\n'
                     return self.router_info
 
-        self.router_info['type'] = brand + ':' + crawler_name
+        self.router_info['module'] = vendor + ':' + crawler_name
         if self.debug:
             print 'find nothing'
             print self.router_info
         return self.router_info
+
 
 if __name__ == '__main__':
     crawler_factory = CrawlerFactory('192.168.0.1', 80, 'admin', 'admin', True)

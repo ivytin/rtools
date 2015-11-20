@@ -5,8 +5,7 @@
 import csv
 import sys
 import time
-from dnsset.type_support import DNSTypeSupport
-from upgrade.type_support import UpgradeTypeSupport
+from module_support import ModuleSupport
 
 
 class CsvHelper(object):
@@ -55,11 +54,11 @@ class CsvHelper(object):
                 continue
             elif list_rht[i][2] == 'success':
                 writer_out.writerow(list_rht[i])
-                dns_method = DNSTypeSupport.dns_set_method(list_rht[i][5])
+                dns_method = ModuleSupport.dns_set_method(list_rht[i][5])
                 if dns_method:
                     dns_out.writerow([list_rht[i][0], list_rht[i][1], list_rht[i][6],
                                       list_rht[i][7], list_rht[i][10], dns_method])
-                upgrade_method, firmware_path = UpgradeTypeSupport.upgrade_set_method(list_rht[i][5], list_rht[i][8],
+                upgrade_method, firmware_path = ModuleSupport.upgrade_set_method(list_rht[i][5], list_rht[i][8],
                                                                                       list_rht[i][9])
                 if upgrade_method:
                     upgrade_out.writerow([list_rht[i][0], list_rht[i][1], list_rht[i][6],

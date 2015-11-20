@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 # @Author: 'tan'
 import threading
-
 import requests
 import re
+
 
 class DnssetFactory(object):
     """produce sepcifical type dns setter"""
@@ -17,7 +17,7 @@ class DnssetFactory(object):
 
     def __init__(self, addr, port, username, password, original_dns, type, dns, debug=False):
         self.try_username = username
-        self.try_passwd = password
+        self.try_password = password
         self.session = requests.session()
 
         self.addr = addr
@@ -37,8 +37,10 @@ class DnssetFactory(object):
             return
         dns = [self.dns, self.original_dns]
         dnsset_module = __import__(self.type)
-        setter = dnsset_module.DnsSetter(self.addr, self.port, self.try_username, self.try_passwd, self.session, self.debug)
+        setter = dnsset_module.DnsSetter(self.addr, self.port, self.try_username, self.try_password, self.session,
+                                         self.debug)
         setter.dns_set(dns)
+
 
 if __name__ == '__main__':
     """Test DNS setter factory"""
