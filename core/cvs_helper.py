@@ -12,6 +12,25 @@ class CsvHelper(object):
     def __init__(self):
         pass
 
+    # @staticmethod
+    # def combine_file(file_path_list):
+    #     time_prefix = time.strftime("%m.%d-%H.%M.%S", time.localtime())
+    #     default_out_file = time_prefix + '_combine_out.csv'
+    #     default_dns_file = time_prefix + '_combine_dns.csv'
+    #     default_upgrade_file = time_prefix + '_combine_upgrade.csv'
+    #     file_out = open(default_out_file, 'wb')
+    #     file_dns = open(default_dns_file, 'wb')
+    #     file_upgrade = open(default_upgrade_file, 'wb')
+    #     writer_out = csv.writer(file_out)
+    #     dns_out = csv.writer(file_dns)
+    #     upgrade_out = csv.writer(file_upgrade)
+    #     reader_list = []
+    #     for file_path in file_path_list:
+    #         reader_list.append(open(file_path, 'rb'))
+
+
+
+
     @staticmethod
     def combine_file(path_lft, path_rht):
         time_prefix = time.strftime("%m.%d-%H.%M.%S", time.localtime())
@@ -47,7 +66,7 @@ class CsvHelper(object):
                     dns_out.writerow([list_lft[i][0], list_lft[i][1], list_lft[i][6],
                                       list_lft[i][7], list_lft[i][10], dns_method])
                 upgrade_method, firmware_path = ModuleSupport.upgrade_set_method(list_lft[i][5], list_lft[i][8],
-                                                                                      list_lft[i][9])
+                                                                                 list_lft[i][9])
                 if upgrade_method:
                     upgrade_out.writerow([list_lft[i][0], list_lft[i][1], list_lft[i][6],
                                           list_lft[i][7], upgrade_method, firmware_path])
@@ -59,7 +78,7 @@ class CsvHelper(object):
                     dns_out.writerow([list_rht[i][0], list_rht[i][1], list_rht[i][6],
                                       list_rht[i][7], list_rht[i][10], dns_method])
                 upgrade_method, firmware_path = ModuleSupport.upgrade_set_method(list_rht[i][5], list_rht[i][8],
-                                                                                      list_rht[i][9])
+                                                                                 list_rht[i][9])
                 if upgrade_method:
                     upgrade_out.writerow([list_rht[i][0], list_rht[i][1], list_rht[i][6],
                                           list_rht[i][7], upgrade_method, firmware_path])

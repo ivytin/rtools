@@ -4,7 +4,6 @@
 
 import requests
 import base64
-import os
 import time
 from requests.auth import HTTPBasicAuth
 from base_upgrade import BaseUpgrader
@@ -37,17 +36,21 @@ class Upgrader(BaseUpgrader):
             self.print_with_lock(self.addr + ': send firmware success, then sleep 1 second')
 
         time.sleep(1)
-        try:
-            self.headers['Referer'] = self.post_url
-            r = HttpHelper.connect_auth_with_headers(None, self.upgrade_url, 3, (self.username, self.password),
+        # send upgrade instruction 3 times to ensure send successfully
+        # TODO: how to check weather upgrade successfully
+        for x in xrange(3):
+            try:
+                self.headers['Referer'] = self.post_url
+                HttpHelper.connect_auth_with_headers(None, self.upgrade_url, 2, (self.username, self.password),
                                                      self.headers)
-        except ErrorTimeout:
-            self.print_with_lock(self.addr + ': send upgrade instruction')
+            except ErrorTimeout:
+                pass
+        self.print_with_lock(self.addr + ': send upgrade instruction')
 
     def post_file(self, url, filename_path, times):
         self.headers['Referer'] = self.base_url + '/userRpm/SoftwareUpgradeRpm.htm'
 
-        multiple_files = [('Filename', open(os.getcwd() + filename_path, 'rb'))]
+        multiple_files = [('Filename', open(filename_path, 'rb'))]
         for x in xrange(times):
             try:
                 r = requests.post(url, files=multiple_files, auth=HTTPBasicAuth(self.username, self.password))
