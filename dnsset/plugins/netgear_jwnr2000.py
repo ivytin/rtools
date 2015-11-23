@@ -4,9 +4,9 @@
 
 import re
 import requests
-from router_info_scan.dnsset.plugins.base_setter import BaseSetter
-from ...http_helper import ErrorTimeout
-from ...http_helper import HttpHelper
+from base_setter import BaseSetter
+from core.http_helper import ErrorTimeout
+from core.http_helper import HttpHelper
 
 
 class DnsSetter(BaseSetter):

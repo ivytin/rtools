@@ -4,10 +4,12 @@
 
 import requests
 import base64
+import os
+import time
 from requests.auth import HTTPBasicAuth
 from base_upgrade import BaseUpgrader
-from ...http_helper import ErrorTimeout
-from ...http_helper import HttpHelper
+from core.http_helper import ErrorTimeout
+from core.http_helper import HttpHelper
 
 
 class Upgrader(BaseUpgrader):
@@ -21,7 +23,7 @@ class Upgrader(BaseUpgrader):
         self.headers['Referer'] = '',
         self.headers['Cookie'] = 'tLargeScreenP=1; subType=pcSub; Authorization=Basic ' + auth_cookie
 
-        self.base_url = self.addr + ':' + str(self.port)
+        self.base_url = 'http://' + self.addr + ':' + str(self.port)
         self.post_url = self.base_url + '/incoming/Firmware.htm'
         self.upgrade_url = self.base_url + '/userRpm/FirmwareUpdateTemp.htm'
 
@@ -31,22 +33,24 @@ class Upgrader(BaseUpgrader):
         except requests.RequestException:
             self.print_with_lock(self.addr + ': send firmware failed')
             return
+        else:
+            self.print_with_lock(self.addr + ': send firmware success, then sleep 1 second')
 
+        time.sleep(1)
         try:
             self.headers['Referer'] = self.post_url
             r = HttpHelper.connect_auth_with_headers(None, self.upgrade_url, 3, (self.username, self.password),
                                                      self.headers)
         except ErrorTimeout:
-            self.print_with_lock(self.addr + ': send upgrade instruction failed')
-        else:
-            self.print_with_lock(self.addr + ': success')
+            self.print_with_lock(self.addr + ': send upgrade instruction')
 
     def post_file(self, url, filename_path, times):
         self.headers['Referer'] = self.base_url + '/userRpm/SoftwareUpgradeRpm.htm'
-        multiple_files = [('Filename', open(filename_path, 'rb'))]
+
+        multiple_files = [('Filename', open(os.getcwd() + filename_path, 'rb'))]
         for x in xrange(times):
             try:
-                r = requests.post(url, file=multiple_files, auth=HTTPBasicAuth(self.username, self.password))
+                r = requests.post(url, files=multiple_files, auth=HTTPBasicAuth(self.username, self.password))
                 return
             except requests.RequestException:
                 pass
