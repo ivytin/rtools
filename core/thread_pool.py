@@ -9,7 +9,7 @@ import time
 import socket
 import sys
 from crawler.crawler_factory import CrawlerFactory
-from dnsset.dnsset_factory import DnssetFactory
+from dnsset.dnsset_factory import DnsSetFactory
 from upgrade.upgrade_factory import UpgradeFactory
 
 
@@ -70,7 +70,7 @@ class WorkManager(object):
         if not self.valid_ip(dns):
             print 'illegal dns address'
             sys.exit(-1)
-        dns_thread = DnssetFactory(target[0][0], target[0][1], target[0][2],
+        dns_thread = DnsSetFactory(target[0][0], target[0][1], target[0][2],
                                    target[0][3], target[0][4],
                                    target[0][5], dns)
         dns_thread.produce()

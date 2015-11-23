@@ -42,11 +42,11 @@ class CsvHelper(object):
             # print list_lft[i][0], list_rht[i][0]
             if list_lft[i][2] == 'success':
                 writer_out.writerow(list_lft[i])
-                dns_method = DNSTypeSupport.dns_set_method(list_lft[i][5])
+                dns_method = ModuleSupport.dns_set_method(list_lft[i][5])
                 if dns_method:
                     dns_out.writerow([list_lft[i][0], list_lft[i][1], list_lft[i][6],
                                       list_lft[i][7], list_lft[i][10], dns_method])
-                upgrade_method, firmware_path = UpgradeTypeSupport.upgrade_set_method(list_lft[i][5], list_lft[i][8],
+                upgrade_method, firmware_path = ModuleSupport.upgrade_set_method(list_lft[i][5], list_lft[i][8],
                                                                                       list_lft[i][9])
                 if upgrade_method:
                     upgrade_out.writerow([list_lft[i][0], list_lft[i][1], list_lft[i][6],

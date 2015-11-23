@@ -7,9 +7,8 @@ import sys
 from optparse import OptionParser
 from core.thread_pool import WorkManager
 from core.cvs_helper import CsvHelper
-
 from crawler.crawler_factory import CrawlerFactory
-from dnsset.dnsset_factory import DnssetFactory
+from dnsset.dnsset_factory import DnsSetFactory
 from upgrade.upgrade_factory import UpgradeFactory
 
 default_out_file = time.strftime("%m.%d-%H.%M.%S", time.localtime()) + '.csv'
@@ -85,11 +84,11 @@ if c_debug:
     for arg in xrange(4):
         try:
             print args[arg]
-        except Exception, e:
+        except Exception:
             print 'args should include ip, port, username, password'
             sys.exit(-1)
     test_crawl = CrawlerFactory(addr=args[0], port=int(args[1]),
-                                        username=args[2], password=args[3], debug=True)
+                                username=args[2], password=args[3], debug=True)
     ret = test_crawl.produce()
     sys.exit(0)
 
@@ -99,18 +98,18 @@ if d_debug:
     for arg in xrange(7):
         try:
             print args[arg]
-        except Exception, e:
+        except Exception:
             print 'arg should include ip, port ,username, password, type, dns1, dns2'
             sys.exit(-1)
     target_dns = [args[5], args[6]]
-    test_setter = DnssetFactory(addr=args[0], port=int(args[1]),
-                                       username=args[2], password=args[3],
-                                       type=args[4], dns=target_dns, debug=True)
+    test_setter = DnsSetFactory(addr=args[0], port=int(args[1]),
+                                username=args[2], password=args[3],
+                                plugin=args[4], dns=target_dns, debug=True)
     ret = test_setter.produce()
     sys.exit(0)
 
 if u_debug:
-# add the plugins path to sys.path to load plugins
+    # add the plugins path to sys.path to load plugins
     sys.path.append('upgrade/plugins')
     for arg in xrange(6):
         try:
@@ -119,15 +118,15 @@ if u_debug:
             print 'arg should include ip, addr, port, username, password, type, firmware'
             sys.exit(-1)
     test_upgrader = UpgradeFactory(addr=args[0], port=args[1],
-                                           username=args[2], password=args[3],
-                                           type=args[4], firmware=args[5], debug=True)
+                                   username=args[2], password=args[3],
+                                   plugin=args[4], firmware=args[5], debug=True)
     ret = test_upgrader.produce()
     sys.exit(0)
 
 data_in_path = options.in_file_path
 try:
     file(data_in_path)
-except Exception, e:
+except Exception:
     print 'no such ip address file'
     sys.exit(0)
 
@@ -144,7 +143,7 @@ if dns_flag:
     sys.path.append('./dnsset/plugins')
     try:
         dns = args[0]
-    except Exception, e:
+    except Exception:
         print 'need dns address to continue'
         sys.exit(-1)
     work_manager = WorkManager(data_in_path, data_out_path, threads_num, 'dns', dns)

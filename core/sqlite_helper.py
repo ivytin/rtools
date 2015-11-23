@@ -14,23 +14,29 @@
 
 import sqlite3
 
+
 def _wrap_value(value):
     return repr(value)
- 
+
+
 def _wrap_values(values):
     return list(map(_wrap_value, values))
- 
+
+
 def _wrap_fields(fields):
     for key,value in fields.items():
         fields[key] = _wrap_value(value)
     return fields
- 
+
+
 def _concat_keys(keys):
     return "[" + "],[".join(keys) + "]"
- 
+
+
 def _concat_values(values):
     return ",".join(values)
- 
+
+
 def _concat_fields(fields, operator = (None, ",")):
     if operator:
         unit_operator, group_operator = operator
@@ -44,7 +50,8 @@ def _concat_fields(fields, operator = (None, ",")):
         compiled.append(group_operator)
     compiled.pop() # pop last group_operator
     return " ".join(compiled)
- 
+
+
 class DataCondition(object):
     """
         本类用于操作SQL构造器辅助类的条件语句部分
