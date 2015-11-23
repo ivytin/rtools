@@ -47,12 +47,12 @@ class ModuleSupport(object):
 
     # only for TEST!!!
     # wr841nv7_en_3_12_9_up(120221)
-    UPGRADED_SUPPORT_TYPES['TP-LINK'].append(('tp_link_wr', '120201', 'WR841.+?(v6|v7)', 'tp_link_wr',
-                                              '/firmware/Test_841N/wr841nv7_en_3_12_9_up(120221).bin'))
-    UPGRADED_SUPPORT_TYPES['TP-LINK'].append(('tp_link_wr', '120221', 'WR841.+?(v6|v7)', 'tp_link_wr',
-                                              '/firmware/Test_841N/wr841nv7_en_3_13_9_up(120201).bin'))
-    UPGRADED_SUPPORT_TYPES['TP-LINK'].append(('tp_link_wr', '120221', 'WR941.+?(v5|v6)', 'tp_link_wr',
-                                              '/firmware/Test_941N/wr941nv4_v5.bin'))
+    # UPGRADED_SUPPORT_TYPES['TP-LINK'].append(('tp_link_wr', '120201', 'WR841.+?(v6|v7)', 'tp_link_wr',
+    #                                           '/firmware/Test_841N/wr841nv7_en_3_12_9_up(120221).bin'))
+    # UPGRADED_SUPPORT_TYPES['TP-LINK'].append(('tp_link_wr', '120221', 'WR841.+?(v6|v7)', 'tp_link_wr',
+    #                                           '/firmware/Test_841N/wr841nv7_en_3_13_9_up(120201).bin'))
+    # UPGRADED_SUPPORT_TYPES['TP-LINK'].append(('tp_link_wr', '120221', 'WR941.+?(v5|v6)', 'tp_link_wr',
+    #                                           '/firmware/Test_941N/wr941nv4_v5.bin'))
 
     # DNSSET_SUPPORT_TYPE sample
     # ['scan_plugin_name', 'dnsset_plugin_name']

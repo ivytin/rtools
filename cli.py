@@ -66,12 +66,21 @@ upgrade_flag = options.upgrade
 c_debug = options.c_debug
 d_debug = options.d_debug
 u_debug = options.u_debug
+data_in_path = options.in_file_path
+data_out_path = options.out_file_path
+threads_num = options.threads_num
 
 combine_mode = options.combine
 
 if combine_mode:
     csv_helper = CsvHelper()
-    csv_helper.combine_file(sys.argv[2], sys.argv[3])
+    # TODO: the sys.args will repeat the first element if len > 1, but why?
+    if args is None:
+        sys.exit(0)
+    elif len(args) == 1:
+        csv_helper.combine_file(args)
+    else:
+        csv_helper.combine_file(args[1:])
     sys.exit(0)
 
 if (crawl_flag or dns_flag or c_debug or d_debug or u_debug or upgrade_flag) is False:
@@ -123,15 +132,11 @@ if u_debug:
     ret = test_upgrader.produce()
     sys.exit(0)
 
-data_in_path = options.in_file_path
 try:
     file(data_in_path)
 except Exception:
     print 'no such ip address file'
     sys.exit(0)
-
-data_out_path = options.out_file_path
-threads_num = options.threads_num
 
 if crawl_flag:
     sys.path.append('./crawler/plugins')

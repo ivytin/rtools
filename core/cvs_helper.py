@@ -12,27 +12,45 @@ class CsvHelper(object):
     def __init__(self):
         pass
 
-    # @staticmethod
-    # def combine_file(file_path_list):
-    #     time_prefix = time.strftime("%m.%d-%H.%M.%S", time.localtime())
-    #     default_out_file = time_prefix + '_combine_out.csv'
-    #     default_dns_file = time_prefix + '_combine_dns.csv'
-    #     default_upgrade_file = time_prefix + '_combine_upgrade.csv'
-    #     file_out = open(default_out_file, 'wb')
-    #     file_dns = open(default_dns_file, 'wb')
-    #     file_upgrade = open(default_upgrade_file, 'wb')
-    #     writer_out = csv.writer(file_out)
-    #     dns_out = csv.writer(file_dns)
-    #     upgrade_out = csv.writer(file_upgrade)
-    #     reader_list = []
-    #     for file_path in file_path_list:
-    #         reader_list.append(open(file_path, 'rb'))
-
-
-
+    @staticmethod
+    def combine_file(file_path_list):
+        time_prefix = time.strftime("%m.%d-%H.%M.%S", time.localtime())
+        reader_list = []
+        for file_path in file_path_list:
+            tmp_reader = csv.reader(open(file_path, 'rb'))
+            for line in tmp_reader:
+                # jump those error rows
+                if len(line) < 10:
+                    continue
+                # select online targets
+                if line[2] != 'offline':
+                    reader_list.append(line)
+        reader_list.sort(key=lambda x: x[0])
+        default_out_file = time_prefix + '_combine_out.csv'
+        default_dns_file = time_prefix + '_combine_dns.csv'
+        default_upgrade_file = time_prefix + '_combine_upgrade.csv'
+        file_out = open(default_out_file, 'wb')
+        file_dns = open(default_dns_file, 'wb')
+        file_upgrade = open(default_upgrade_file, 'wb')
+        writer_out = csv.writer(file_out)
+        dns_out = csv.writer(file_dns)
+        upgrade_out = csv.writer(file_upgrade)
+        for line in reader_list:
+            if line[2] == 'success':
+                dns_method = ModuleSupport.dns_set_method(line[5])
+                if dns_method:
+                    dns_out.writerow([line[0], line[1], line[6],
+                                      line[7], line[10], dns_method])
+                upgrade_method, firmware_path = ModuleSupport.upgrade_set_method(line[5], line[8],
+                                                                                 line[9])
+                if upgrade_method:
+                    upgrade_out.writerow([line[0], line[1], line[6],
+                                          line[7], upgrade_method, firmware_path])
+            writer_out.writerow(line)
+        print 'combine file finish'
 
     @staticmethod
-    def combine_file(path_lft, path_rht):
+    def ori_combine_file(path_lft, path_rht):
         time_prefix = time.strftime("%m.%d-%H.%M.%S", time.localtime())
         default_out_file = time_prefix + '_combine_out.csv'
         default_dns_file = time_prefix + '_combine_dns.csv'
