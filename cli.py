@@ -77,10 +77,9 @@ if combine_mode:
     # TODO: the sys.args will repeat the first element if len > 1, but why?
     if args is None:
         sys.exit(0)
-    elif len(args) == 1:
-        csv_helper.combine_file(args)
     else:
-        csv_helper.combine_file(args[1:])
+        csv_helper.combine_file(args)
+    print args
     sys.exit(0)
 
 if (crawl_flag or dns_flag or c_debug or d_debug or u_debug or upgrade_flag) is False:
@@ -110,10 +109,9 @@ if d_debug:
         except Exception:
             print 'arg should include ip, port ,username, password, type, dns1, dns2'
             sys.exit(-1)
-    target_dns = [args[5], args[6]]
     test_setter = DnsSetFactory(addr=args[0], port=int(args[1]),
-                                username=args[2], password=args[3],
-                                plugin=args[4], dns=target_dns, debug=True)
+                                username=args[2], password=args[3], original_dns=args[6],
+                                plugin=args[4], dns=args[5], debug=True)
     ret = test_setter.produce()
     sys.exit(0)
 

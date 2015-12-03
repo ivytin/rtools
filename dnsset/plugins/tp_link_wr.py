@@ -89,7 +89,7 @@ class DnsSetter(BaseSetter):
         if self.debug:
             self.print_with_lock(dns_url)
         try:
-            r = HttpHelper.connect_auth_with_headers(None, dns_url, 3, (self.username, self.password), 3)
+            r = HttpHelper.connect_auth_with_headers(None, dns_url, 3, (self.username, self.password), self.headers)
         except ErrorTimeout:
             self.print_with_lock(self.addr + ': maybe fail, no response')
         else:

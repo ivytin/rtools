@@ -37,7 +37,11 @@ class DnsSetFactory(object):
             self.print_with_lock(self.addr + ': fail, find no original dns')
             return
         dns = [self.dns, self.original_dns]
-        dns_set_module = __import__(self.plugin)
+        try:
+            dns_set_module = __import__(self.plugin)
+        except ImportError:
+            print 'no plugin nameed ' + self.plugin
+            return
         setter = dns_set_module.DnsSetter(self.addr, self.port, self.username, self.password, self.session,
                                           self.debug)
         setter.dns_set(dns)
