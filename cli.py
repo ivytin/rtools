@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Author: tan
-
+import os
 import time
 import sys
 from optparse import OptionParser
@@ -74,7 +74,6 @@ combine_mode = options.combine
 
 if combine_mode:
     csv_helper = CsvHelper()
-    # TODO: the sys.args will repeat the first element if len > 1, but why?
     if args is None:
         sys.exit(0)
     else:
@@ -107,7 +106,7 @@ if d_debug:
         try:
             print args[arg]
         except Exception:
-            print 'arg should include ip, port ,username, password, type, dns1, dns2'
+            print 'arg should include ip, port ,username, password, plugin, dns1, dns2'
             sys.exit(-1)
     test_setter = DnsSetFactory(addr=args[0], port=int(args[1]),
                                 username=args[2], password=args[3], original_dns=args[6],
@@ -122,11 +121,16 @@ if u_debug:
         try:
             print args[arg]
         except Exception:
-            print 'arg should include ip, addr, port, username, password, type, firmware'
+            print 'arg should include ip, port, username, password, plugin, firmware'
             sys.exit(-1)
+    if not os.path.exists(args[5]):
+        print 'can not find the firmware file, please check the path'
+        sys.exit(-1)
+
+    firmware_path = os.path.abspath(args[5])
     test_upgrader = UpgradeFactory(addr=args[0], port=args[1],
                                    username=args[2], password=args[3],
-                                   plugin=args[4], firmware=args[5], debug=True)
+                                   plugin=args[4], firmware=firmware_path, debug=True)
     ret = test_upgrader.produce()
     sys.exit(0)
 
